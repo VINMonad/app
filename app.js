@@ -98,3 +98,89 @@ async function refreshBalances() {
 if (window.ethereum) {
   window.ethereum.on("accountsChanged", () => location.reload());
 }
+
+// =====================================================
+// PART 2 — RE-ATTACH SWAP & DICE (LEGACY LOGIC)
+// =====================================================
+
+// ⚠️ IMPORTANT:
+// - This section assumes your previous Swap & Dice code
+//   is copied here WITHOUT modification.
+// - Only contract addresses are updated to VINMonad.
+
+// ------------------ CONTRACT ADDRESSES ------------------
+const VIN_SWAP_ADDRESS = "0x73a8C8Bf994A53DaBb9aE707cD7555DFD1909fbB";
+const VIN_DICE_ADDRESS = "0xf2b1C0A522211949Ad2671b0F4bF92547d66ef3A";
+
+// ------------------ PLACEHOLDER ABIs ------------------
+// Replace these with your ORIGINAL ABIs from VinMonDice
+
+const VIN_SWAP_ABI = [
+  "function swapVINtoMON(uint256 vinAmount)",
+  "function swapMONtoVIN() payable",
+];
+
+const VIN_DICE_ABI = [
+  "function play(uint256 amount, uint8 choice, uint256 clientSeed)",
+];
+
+// =====================================================
+// SWAP (LEGACY UI HOOK)
+// =====================================================
+
+let swapContract;
+
+function initSwap() {
+  if (!provider) return;
+
+  swapContract = new ethers.Contract(
+    VIN_SWAP_ADDRESS,
+    VIN_SWAP_ABI,
+    signer || provider
+  );
+
+  // ⚠️ IMPORTANT:
+  // At this point, your ORIGINAL swap UI rendering logic
+  // should be pasted below.
+  //
+  // Example:
+  // renderSwapUI(swapContract);
+}
+
+// =====================================================
+// DICE (LEGACY UI HOOK)
+// =====================================================
+
+let diceContract;
+
+function initDice() {
+  if (!provider) return;
+
+  diceContract = new ethers.Contract(
+    VIN_DICE_ADDRESS,
+    VIN_DICE_ABI,
+    signer || provider
+  );
+
+  // ⚠️ IMPORTANT:
+  // Paste your ORIGINAL dice UI logic here.
+  //
+  // Example:
+  // renderDiceUI(diceContract);
+}
+
+// =====================================================
+// AUTO INIT WHEN WALLET CONNECTED
+// =====================================================
+
+async function initGames() {
+  initSwap();
+  initDice();
+}
+
+// Patch connectWallet to init games
+const _connectWallet = connectWallet;
+connectWallet = async function () {
+  await _connectWallet();
+  await initGames();
+};
