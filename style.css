@@ -1,3 +1,7 @@
+/* =========================================================
+   VINMonad dApp – Style
+   ========================================================= */
+
 /* ================= RESET ================= */
 *,
 *::before,
@@ -179,11 +183,51 @@ main {
   background: rgba(30, 64, 175, 0.5);
 }
 
-/* ================= DICE ================= */
+/* ================= SWAP / DICE COMMON ================= */
+#swap-container,
+#dice-container {
+  max-width: 420px;
+  margin: 1.5rem auto;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: radial-gradient(circle at top, #0f172a 0%, #020617 70%);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.7);
+}
+
+#swap-container input,
+#dice-container input {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: 0.6rem;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(15, 23, 42, 0.9);
+  color: #e5e7eb;
+}
+
+#swap-container button,
+#dice-container button {
+  width: 100%;
+  margin-bottom: 0.4rem;
+  padding: 0.5rem;
+  border-radius: 0.6rem;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  background: rgba(15, 23, 42, 0.95);
+  color: #e5e7eb;
+  cursor: pointer;
+}
+#swap-container button:hover,
+#dice-container button:hover {
+  background: rgba(30, 64, 175, 0.5);
+}
+
+/* ================= DICE INFO ================= */
 .dice-info {
+  max-width: 420px;
+  margin: 0 auto 0.6rem;
   display: flex;
   justify-content: space-between;
-  margin-bottom: 0.6rem;
   font-size: 0.8rem;
   color: #9ca3af;
 }
@@ -191,7 +235,7 @@ main {
 /* ================= LOTTO ================= */
 .lotto-box {
   max-width: 520px;
-  margin: 0 auto;
+  margin: 1.5rem auto;
   padding: 1rem;
   border-radius: 1rem;
   background: radial-gradient(circle at top, #0f172a 0%, #020617 70%);
@@ -220,6 +264,14 @@ main {
   font-size: 0.85rem;
   border-bottom: 1px solid rgba(148, 163, 184, 0.15);
 }
+.lotto-table input {
+  width: 100%;
+  padding: 0.25rem;
+  border-radius: 0.4rem;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(15, 23, 42, 0.9);
+  color: #e5e7eb;
+}
 
 .lotto-tools {
   display: flex;
@@ -239,6 +291,7 @@ main {
   background: rgba(30, 64, 175, 0.5);
 }
 
+/* ================= BUTTONS ================= */
 .btn-primary {
   width: 100%;
   padding: 0.6rem;
@@ -253,6 +306,7 @@ main {
   filter: brightness(1.07);
 }
 
+/* ================= STATUS ================= */
 .tx-status {
   margin-top: 0.4rem;
   font-size: 0.8rem;
