@@ -1,210 +1,451 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>VINMonad</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>VINMonad</title>
+    <meta name="description" content="On-chain utilities on Monad: Swap, Dice, Lotto." />
+    <link rel="icon" href="./logo.png" />
+    <link rel="stylesheet" href="./style.css" />
 
-  <meta
-    name="description"
-    content="On-chain utilities built on Monad: Swap, Dice, and Lotto using the VIN token. Open-source, verifiable, and immutable."
-  />
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js" defer></script>
+    <script src="./app.js" defer></script>
+  </head>
 
-  <link rel="icon" type="image/png" href="logo.png" />
-  <link rel="stylesheet" href="style.css" />
-</head>
+  <body>
+    <div class="app-shell">
+      <!-- TOP NAV -->
+      <header class="top-nav">
+        <div class="brand">
+          <img class="brand-logo" src="./logo.png" alt="VINMonad" />
+          <div class="brand-text">
+            <div class="brand-title">VINMonad</div>
+            <div class="brand-subtitle">Swap • Dice • Lotto</div>
+          </div>
+        </div>
 
-<body>
+        <div class="nav-center">
+          <div class="nav-links">
+            <button class="nav-link active" id="navHome">Home</button>
+            <button class="nav-link" id="navSwap">Swap</button>
+            <button class="nav-link" id="navDice">Dice</button>
+            <button class="nav-link" id="navLotto">Lotto</button>
+          </div>
+        </div>
 
-<!-- ================= HEADER ================= -->
-<header class="header">
-  <div class="logo">
-    <img src="logo.png" alt="VINMonad" />
-    <span>VINMonad</span>
+        <div class="nav-right">
+          <div class="price-chip" title="Derived from MON price">
+            <span class="price-label">VIN/USD:</span>
+            <span class="price-value" id="vinUsdChip">Loading...</span>
+          </div>
+
+          <div class="network-indicator" title="Network">
+            <span class="dot dot-disconnected" id="netDot"></span>
+            <span class="network-label" id="netLabel">Not connected</span>
+          </div>
+
+          <button class="btn btn-connect" id="connectBtn">Connect</button>
+        </div>
+      </header>
+
+      <!-- MAIN -->
+      <main class="main-content">
+        <!-- HOME -->
+        <section class="screen screen-active" id="home-screen">
+          <div class="screen-header compact">
+            <h1>Dashboard</h1>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-title">Quick</div>
+
+              <div class="actions-row">
+                <button class="btn btn-primary" id="goSwapBtn">Swap</button>
+                <button class="btn btn-secondary" id="goDiceBtn">Dice</button>
+                <button class="btn btn-secondary" id="goLottoBtn">Lotto</button>
+                <button class="btn btn-outline" id="refreshBtn">Refresh</button>
+              </div>
+
+              <div class="kv">
+                <div class="kv-row">
+                  <span class="kv-k">Wallet</span>
+                  <span class="kv-v" id="homeWalletShort">Not connected</span>
+                </div>
+                <div class="kv-row">
+                  <span class="kv-k">VIN Balance</span>
+                  <span class="kv-v" id="homeVinBalance">-</span>
+                </div>
+                <div class="kv-row">
+                  <span class="kv-k">MON Balance</span>
+                  <span class="kv-v" id="homeMonBalance">-</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">Pools</div>
+
+              <div class="kv">
+                <div class="kv-row">
+                  <span class="kv-k">Dice Pool (VIN)</span>
+                  <span class="kv-v" id="homeDicePool">Loading...</span>
+                </div>
+                <div class="kv-row">
+                  <span class="kv-k">Lotto Pool (VIN)</span>
+                  <span class="kv-v" id="homeLottoPool">Loading...</span>
+                </div>
+              </div>
+
+              <div class="mini-note" id="homeNote"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SWAP -->
+        <section class="screen" id="swap-screen">
+          <div class="screen-header">
+            <h1>Swap</h1>
+          </div>
+
+          <div class="swap-layout">
+            <div class="swap-card">
+              <div class="swap-header">
+                <div class="swap-tabs">
+                  <button class="swap-tab active" id="tabVinToMon">VIN → MON</button>
+                  <button class="swap-tab" id="tabMonToVin">MON → VIN</button>
+                </div>
+              </div>
+
+              <div class="swap-body">
+                <div class="swap-row">
+                  <div class="swap-label-row">
+                    <span class="swap-label">From</span>
+                    <span class="swap-balance" id="swapFromBalance">Balance: -</span>
+                  </div>
+
+                  <div class="swap-input-row">
+                    <input
+                      type="text"
+                      inputmode="decimal"
+                      placeholder="0.0"
+                      id="swapFromAmount"
+                      class="swap-input"
+                    />
+                    <button class="swap-token-tag" id="swapFromToken">VIN</button>
+                    <button class="btn-max" id="swapMaxBtn">MAX</button>
+                  </div>
+                </div>
+
+                <div class="swap-row">
+                  <div class="swap-label-row">
+                    <span class="swap-label">To</span>
+                    <span class="swap-balance" id="swapToBalance">Balance: -</span>
+                  </div>
+
+                  <div class="swap-input-row">
+                    <input
+                      type="text"
+                      placeholder="0.0"
+                      id="swapToAmount"
+                      class="swap-input"
+                      readonly
+                    />
+                    <button class="swap-token-tag" id="swapToToken">MON</button>
+                  </div>
+                </div>
+
+                <div class="swap-rate">
+                  <span id="swapRateLabel">Rate: -</span>
+                </div>
+
+                <button class="btn btn-primary btn-swap-action" id="swapBtn">Swap</button>
+
+                <div class="tx-status" id="swapStatus">Ready.</div>
+              </div>
+            </div>
+
+            <aside class="swap-info-card">
+              <div class="card-title">Wallet</div>
+              <div class="kv">
+                <div class="kv-row">
+                  <span class="kv-k">Wallet</span>
+                  <span class="kv-v" id="swapWalletShort">Not connected</span>
+                </div>
+                <div class="kv-row">
+                  <span class="kv-k">VIN</span>
+                  <span class="kv-v" id="swapVinBalance">-</span>
+                </div>
+                <div class="kv-row">
+                  <span class="kv-k">MON</span>
+                  <span class="kv-v" id="swapMonBalance">-</span>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <!-- DICE -->
+        <section class="screen" id="dice-screen">
+          <div class="screen-header">
+            <h1>Dice</h1>
+          </div>
+
+          <div class="dice-layout">
+            <div class="dice-card">
+              <div class="dice-section">
+                <div class="card-title">Wallet</div>
+
+                <div class="kv">
+                  <div class="kv-row">
+                    <span class="kv-k">Wallet</span>
+                    <span class="kv-v" id="diceWalletShort">Not connected</span>
+                  </div>
+                  <div class="kv-row">
+                    <span class="kv-k">VIN Balance</span>
+                    <span class="kv-v" id="diceVinBalance">-</span>
+                  </div>
+                  <div class="kv-row">
+                    <span class="kv-k">MON Balance</span>
+                    <span class="kv-v" id="diceMonBalance">-</span>
+                  </div>
+                  <div class="kv-row">
+                    <span class="kv-k">Allowance</span>
+                    <span class="kv-v" id="diceAllowance">-</span>
+                  </div>
+                </div>
+
+                <div class="card-title" style="margin-top: 14px;">Pool</div>
+                <div class="kv">
+                  <div class="kv-row">
+                    <span class="kv-k">Bankroll (VIN)</span>
+                    <span class="kv-v" id="diceBankroll">Loading...</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="dice-card">
+              <div class="dice-section">
+                <div class="card-title">Play</div>
+
+                <label class="dice-label" for="diceBetAmount">Bet Amount (VIN)</label>
+                <div class="dice-input-row">
+                  <input
+                    id="diceBetAmount"
+                    class="dice-input"
+                    type="text"
+                    inputmode="decimal"
+                    placeholder="1.0"
+                    value="1"
+                  />
+                  <button class="btn-max" id="diceMaxBtn">MAX</button>
+                </div>
+
+                <div class="dice-minimum-line" id="diceMinLine">
+                  MIN: <span id="diceMinValue">1</span> VIN • MAX: <span id="diceMaxValue">50</span> VIN
+                </div>
+
+                <div class="dice-guess-buttons">
+                  <button class="guess-button active" id="guessEven">EVEN</button>
+                  <button class="guess-button" id="guessOdd">ODD</button>
+                </div>
+
+                <div class="dice-tools">
+                  <div class="dice-tool-buttons">
+                    <button class="btn-tool" id="diceApproveBtn">Approve VIN</button>
+                    <button class="btn-tool" id="dicePlayBtn">Play</button>
+                  </div>
+                  <p class="dice-note" id="diceStatus">Ready.</p>
+                </div>
+
+                <div class="dice-visual" id="diceVisual">
+                  <div class="dice-orb"></div>
+                  <div class="dice-coins">
+                    <div class="dice-coin dice-coin-white"></div>
+                    <div class="dice-coin dice-coin-white"></div>
+                    <div class="dice-coin dice-coin-white"></div>
+                    <div class="dice-coin dice-coin-white"></div>
+                  </div>
+                  <div class="dice-result-text" id="diceResultText">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- LOTTO -->
+        <section class="screen" id="lotto-screen">
+          <div class="screen-header">
+            <h1>Lotto</h1>
+          </div>
+
+          <div class="swap-layout">
+            <div class="swap-card">
+              <div class="swap-header">
+                <div class="swap-tabs">
+                  <button class="swap-tab active" id="tabBetOne">BetOne</button>
+                  <button class="swap-tab" id="tabBet27">Bet27</button>
+                </div>
+              </div>
+
+              <div class="swap-body">
+                <div class="swap-row">
+                  <div class="swap-label-row">
+                    <span class="swap-label">Amount (VIN)</span>
+                    <span class="swap-balance" id="lottoVinBalance">Balance: -</span>
+                  </div>
+
+                  <div class="swap-input-row">
+                    <input
+                      type="text"
+                      inputmode="decimal"
+                      placeholder="1.0"
+                      id="lottoAmount"
+                      class="swap-input"
+                      value="1"
+                    />
+                    <button class="swap-token-tag">VIN</button>
+                  </div>
+
+                  <div class="tx-status" id="lottoMinLine">MIN: 1 VIN</div>
+                </div>
+
+                <div class="swap-row">
+                  <div class="swap-label-row">
+                    <span class="swap-label">Numbers (00–99)</span>
+                    <span class="swap-balance" id="lottoPickHint">e.g. 12,27,45</span>
+                  </div>
+
+                  <div class="swap-input-row">
+                    <input
+                      type="text"
+                      placeholder="12,27,45"
+                      id="lottoNumbers"
+                      class="swap-input"
+                    />
+                    <button class="btn-max" id="lottoQuickBtn">Quick</button>
+                  </div>
+                </div>
+
+                <div class="swap-row">
+                  <div class="swap-label-row">
+                    <span class="swap-label">Secret</span>
+                    <span class="swap-balance" id="lottoCommitLabel">Commit: -</span>
+                  </div>
+
+                  <div class="swap-input-row">
+                    <input
+                      type="text"
+                      placeholder="Auto-generated"
+                      id="lottoSecret"
+                      class="swap-input"
+                    />
+                    <button class="btn-max" id="lottoGenSecretBtn">Generate</button>
+                  </div>
+                </div>
+
+                <button class="btn btn-primary btn-full" id="lottoApproveBtn">Approve VIN</button>
+                <button class="btn btn-secondary btn-full" id="lottoPlaceBetBtn">Place Bet</button>
+                <button class="btn btn-outline btn-full" id="lottoRevealBtn">Reveal</button>
+
+                <div class="tx-status" id="lottoStatus">Ready.</div>
+              </div>
+            </div>
+
+            <aside class="swap-info-card">
+              <div class="card-title">Wallet</div>
+
+              <div class="kv">
+                <div class="kv-row">
+                  <span class="kv-k">Wallet</span>
+                  <span class="kv-v" id="lottoWalletShort">Not connected</span>
+                </div>
+                <div class="kv-row">
+                  <span class="kv-k">Allowance</span>
+                  <span class="kv-v" id="lottoAllowance">-</span>
+                </div>
+                <div class="kv-row">
+                  <span class="kv-k">Pool (VIN)</span>
+                  <span class="kv-v" id="lottoPool">Loading...</span>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-left">
+      <span class="footer-brand">VINMonad</span>
+      <span class="footer-network">Monad • ChainId 143</span>
+    </div>
+
+    <div class="footer-links">
+      <a
+        href="https://monad.blockscout.com/address/0x038A2f1abe221d403834aa775669169Ef5eb120A"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        VIN Token
+      </a>
+      <a
+        href="https://monad.blockscout.com/address/0x73a8C8Bf994A53DaBb9aE707cD7555DFD1909fbB"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Swap
+      </a>
+      <a
+        href="https://monad.blockscout.com/address/0xf2b1C0A522211949Ad2671b0F4bF92547d66ef3A"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Dice
+      </a>
+      <a
+        href="https://monad.blockscout.com/address/0x84392F14fCeCEEe31a5Fd69BfD0Dd2a9AAF364E5"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Lotto
+      </a>
+    </div>
+
+    <div class="footer-social">
+      <a
+        href="https://vinmonad.github.io/app"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Web
+      </a>
+      <a
+        href="https://ipfs.io/ipfs/bafybeigh2cnllrenu3gbtn6qk2ctlqs54ibwqwewa4s56squkzpguhcsve"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        IPFS
+      </a>
+      <a
+        href="https://t.me/vinmonad"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Telegram
+      </a>
+      <a
+        href="https://x.com/vinmonad"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        X
+      </a>
+    </div>
   </div>
-
-  <nav class="menu">
-    <button id="menuHome" class="menu-btn active">Home</button>
-    <button id="menuSwap" class="menu-btn">Swap</button>
-    <button id="menuDice" class="menu-btn">Dice</button>
-    <button id="menuLotto" class="menu-btn">Lotto</button>
-  </nav>
-
-  <div class="header-right">
-    <div class="price-chip">
-      <span>VIN</span>
-      <span id="vinPriceUsd">–</span>
-      <span>USD</span>
-    </div>
-
-    <div class="wallet">
-      <span id="walletAddress">–</span>
-      <button id="connectWallet">Connect</button>
-    </div>
-  </div>
-</header>
-
-<!-- ================= MAIN ================= -->
-<main>
-
-  <!-- ========== HOME ========== -->
-  <section id="home" class="page active">
-    <div class="home-box">
-
-      <div class="balance">
-        <div>VIN: <span id="vinBalance">–</span></div>
-        <div>MON: <span id="monBalance">–</span></div>
-      </div>
-
-      <div class="home-actions">
-        <button data-go="swap">Swap</button>
-        <button data-go="dice">Dice</button>
-        <button data-go="lotto">Lotto</button>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ========== SWAP ========== -->
-  <section id="swap" class="page">
-    <!-- Swap UI rendered by app.js -->
-    <div id="swap-container"></div>
-  </section>
-
-  <!-- ========== DICE ========== -->
-  <section id="dice" class="page">
-
-    <div class="dice-info">
-      <span>Min: 1 VIN</span>
-      <span>Max: 50 VIN</span>
-    </div>
-
-    <!-- Dice UI rendered by app.js -->
-    <div id="dice-container"></div>
-  </section>
-
-  <!-- ========== LOTTO ========== -->
-  <section id="lotto" class="page">
-    <div class="lotto-box">
-
-      <div class="lotto-type">
-        <label>
-          <input type="radio" name="lottoType" value="betone" checked />
-          BetOne (x70)
-        </label>
-        <label>
-          <input type="radio" name="lottoType" value="bet27" />
-          Bet27 (x3 per hit)
-        </label>
-      </div>
-
-      <table class="lotto-table">
-        <thead>
-          <tr>
-            <th>Number (00–99)</th>
-            <th>VIN</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="lottoRows">
-          <!-- rows added by JS -->
-        </tbody>
-      </table>
-
-      <div class="lotto-tools">
-        <button id="lottoAdd">+</button>
-        <button id="lottoHalf">½</button>
-        <button id="lottoDouble">×2</button>
-        <button id="lottoClear">Clear</button>
-      </div>
-
-      <button id="lottoPlay" class="btn-primary">
-        Play Lotto
-      </button>
-
-      <div id="lottoStatus" class="tx-status">–</div>
-      <div id="lottoResult" class="lotto-result"></div>
-
-    </div>
-  </section>
-
-</main>
-
-<!-- ================= FOOTER ================= -->
-<footer class="footer">
-
-  <div class="footer-contracts">
-    <a
-      href="https://monadvision.com/token/0x038A2f1abe221d403834aa775669169Ef5eb120A"
-      target="_blank"
-    >
-      VIN Token
-    </a>
-    •
-    <a
-      href="https://monadvision.com/address/0x73a8C8Bf994A53DaBb9aE707cD7555DFD1909fbB"
-      target="_blank"
-    >
-      Swap
-    </a>
-    •
-    <a
-      href="https://monadvision.com/address/0xf2b1C0A522211949Ad2671b0F4bF92547d66ef3A"
-      target="_blank"
-    >
-      Dice
-    </a>
-    •
-    <a
-      href="https://monadvision.com/address/0x84392F14fCeCEEe31a5Fd69BfD0Dd2a9AAF364E5"
-      target="_blank"
-    >
-      Lotto
-    </a>
-  </div>
-
-  <div class="footer-links">
-    <a href="https://github.com/vinmonad" target="_blank">GitHub</a>
-    •
-    <a href="https://x.com/vinmonad" target="_blank">X</a>
-    •
-    <a href="https://t.me/vinmonad" target="_blank">Telegram</a>
-  </div>
-
 </footer>
 
-<!-- ================= SCRIPTS ================= -->
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-<script src="app.js"></script>
-
-<script>
-async function fetchVinPriceUsd() {
-  const el = document.getElementById("vinPriceUsd");
-  if (!el) return;
-
-  try {
-    const res = await fetch(
-      "https://api.coingecko.com/api/v3/simple/price?ids=monad&vs_currencies=usd"
-    );
-    const data = await res.json();
-    const monUsd = data?.monad?.usd;
-
-    if (!monUsd) {
-      el.textContent = "N/A";
-      return;
-    }
-
-    // VIN = 100 × MON
-    const vinUsd = monUsd * 100;
-    el.textContent = vinUsd.toFixed(4);
-  } catch {
-    el.textContent = "N/A";
-  }
-}
-
-fetchVinPriceUsd();
-setInterval(fetchVinPriceUsd, 60000);
-</script>
-
-</body>
+    </div>
+  </body>
 </html>
