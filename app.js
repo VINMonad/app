@@ -1,38 +1,102 @@
-// ================= CONFIG =================
+/* =========================================================
+   VINMonad dApp
+   Network: Monad (chainId 143)
+   Tech: ethers.js v5
+   ========================================================= */
+
+/* ================= CONFIG ================= */
 const CHAIN_ID = 143;
+const CHAIN_ID_HEX = "0x8f";
+const RPC_URL = "https://rpc.monad.xyz";
 
 // Contracts
 const VIN_ADDRESS = "0x038A2f1abe221d403834aa775669169Ef5eb120A";
-const VIN_DECIMALS = 18;
+const VIN_SWAP_ADDRESS = "0x73a8C8Bf994A53DaBb9aE707cD7555DFD1909fbB";
+const VIN_DICE_ADDRESS = "0xf2b1C0A522211949Ad2671b0F4bF92547d66ef3A";
+const VIN_LOTTO_ADDRESS = "0x84392F14fCeCEEe31a5Fd69BfD0Dd2a9AAF364E5";
 
-// Elements
-const connectBtn = document.getElementById("connectWallet");
-const walletAddressEl = document.getElementById("walletAddress");
-const vinBalanceEl = document.getElementById("vinBalance");
-const monBalanceEl = document.getElementById("monBalance");
+const VIN_DECIMALS = 18;
+const MON_DECIMALS = 18;
+
+/* ================= DOM ================= */
+const $ = (id) => document.getElementById(id);
+
+// Header / wallet
+const connectBtn = $("connectWallet");
+const walletAddressEl = $("walletAddress");
+const vinBalanceEl = $("vinBalance");
+const monBalanceEl = $("monBalance");
 
 // Pages
 const pages = {
-  home: document.getElementById("home"),
-  swap: document.getElementById("swap"),
-  dice: document.getElementById("dice"),
-  lotto: document.getElementById("lotto"),
+  home: $("home"),
+  swap: $("swap"),
+  dice: $("dice"),
+  lotto: $("lotto"),
 };
 
 // Menu buttons
 const menuButtons = {
-  home: document.getElementById("menuHome"),
-  swap: document.getElementById("menuSwap"),
-  dice: document.getElementById("menuDice"),
-  lotto: document.getElementById("menuLotto"),
+  home: $("menuHome"),
+  swap: $("menuSwap"),
+  dice: $("menuDice"),
+  lotto: $("menuLotto"),
 };
 
-// ================= GLOBAL STATE =================
+/* ================= STATE ================= */
 let provider;
 let signer;
 let userAddress;
 
-// ================= MENU HANDLING =================
+// Contracts
+let vinRead, vinWrite;
+let swapWrite;
+let diceWrite;
+let lottoWrite;
+
+/* ================= ABIs ================= */
+const VIN_ABI = [
+  "function balanceOf(address) view returns (uint256)",
+  "function allowance(address,address) view returns (uint256)",
+  "function approve(address,uint256) returns (bool)",
+];
+
+const VIN_SWAP_ABI = [
+  "function swapVINtoMON(uint256 vinAmount)",
+  "function swapMONtoVIN() payable",
+];
+
+const VIN_DICE_ABI = [
+  "function play(uint256 amount, uint8 choice, uint256 clientSeed)",
+];
+
+const VIN_LOTTO_ABI = [
+  "function placeBet(uint256 amount,uint8[] numbers,bytes32 commit,bool isBet27)",
+  "function reveal(bytes32 secret)",
+];
+
+/* ================= HELPERS ================= */
+function shorten(addr) {
+  return addr.slice(0, 6) + "..." + addr.slice(-4);
+}
+
+function parseVin(val) {
+  return ethers.utils.parseUnits(val || "0", VIN_DECIMALS);
+}
+
+function formatVin(bn) {
+  return ethers.utils.formatUnits(bn || 0, VIN_DECIMALS);
+}
+
+function formatMon(bn) {
+  return ethers.utils.formatEther(bn || 0);
+}
+
+function randomSeed() {
+  return Math.floor(Math.random() * 1e16);
+}
+
+/* ================= MENU ================= */
 function showPage(page) {
   Object.values(pages).forEach((p) => p.classList.remove("active"));
   Object.values(menuButtons).forEach((b) => b.classList.remove("active"));
@@ -46,141 +110,240 @@ menuButtons.swap.onclick = () => showPage("swap");
 menuButtons.dice.onclick = () => showPage("dice");
 menuButtons.lotto.onclick = () => showPage("lotto");
 
-// Home quick buttons
 document.querySelectorAll("[data-go]").forEach((btn) => {
   btn.onclick = () => showPage(btn.dataset.go);
 });
 
-// ================= WALLET =================
+/* ================= NETWORK ================= */
+async function ensureNetwork() {
+  const cid = await window.ethereum.request({ method: "eth_chainId" });
+  if (cid === CHAIN_ID_HEX) return;
+
+  await window.ethereum.request({
+    method: "wallet_switchEthereumChain",
+    params: [{ chainId: CHAIN_ID_HEX }],
+  });
+}
+
+/* ================= WALLET ================= */
 async function connectWallet() {
   if (!window.ethereum) {
-    alert("MetaMask not found");
+    alert("Wallet not found");
     return;
   }
+
+  await ensureNetwork();
 
   provider = new ethers.providers.Web3Provider(window.ethereum);
   await provider.send("eth_requestAccounts", []);
   signer = provider.getSigner();
   userAddress = await signer.getAddress();
 
-  walletAddressEl.textContent =
-    userAddress.slice(0, 6) + "..." + userAddress.slice(-4);
-
+  walletAddressEl.textContent = shorten(userAddress);
   connectBtn.textContent = "Connected";
 
+  initContracts();
   await refreshBalances();
 }
 
 connectBtn.onclick = connectWallet;
 
-// ================= BALANCES =================
-async function refreshBalances() {
-  if (!provider || !userAddress) return;
-
-  // MON balance
-  const mon = await provider.getBalance(userAddress);
-  monBalanceEl.textContent = ethers.utils.formatEther(mon);
-
-  // VIN balance
-  const vin = new ethers.Contract(
-    VIN_ADDRESS,
-    [
-      "function balanceOf(address) view returns (uint256)",
-    ],
-    provider
-  );
-
-  const vinBal = await vin.balanceOf(userAddress);
-  vinBalanceEl.textContent = ethers.utils.formatUnits(vinBal, VIN_DECIMALS);
-}
-
-// ================= AUTO CONNECT =================
 if (window.ethereum) {
   window.ethereum.on("accountsChanged", () => location.reload());
 }
 
-// =====================================================
-// PART 2 — RE-ATTACH SWAP & DICE (LEGACY LOGIC)
-// =====================================================
+/* ================= CONTRACT INIT ================= */
+function initContracts() {
+  const rpc = new ethers.providers.JsonRpcProvider(RPC_URL);
 
-// ⚠️ IMPORTANT:
-// - This section assumes your previous Swap & Dice code
-//   is copied here WITHOUT modification.
-// - Only contract addresses are updated to VINMonad.
+  vinRead = new ethers.Contract(VIN_ADDRESS, VIN_ABI, rpc);
+  vinWrite = new ethers.Contract(VIN_ADDRESS, VIN_ABI, signer);
 
-// ------------------ CONTRACT ADDRESSES ------------------
-const VIN_SWAP_ADDRESS = "0x73a8C8Bf994A53DaBb9aE707cD7555DFD1909fbB";
-const VIN_DICE_ADDRESS = "0xf2b1C0A522211949Ad2671b0F4bF92547d66ef3A";
+  swapWrite = new ethers.Contract(VIN_SWAP_ADDRESS, VIN_SWAP_ABI, signer);
+  diceWrite = new ethers.Contract(VIN_DICE_ADDRESS, VIN_DICE_ABI, signer);
+  lottoWrite = new ethers.Contract(VIN_LOTTO_ADDRESS, VIN_LOTTO_ABI, signer);
+}
 
-// ------------------ PLACEHOLDER ABIs ------------------
-// Replace these with your ORIGINAL ABIs from VinMonDice
+/* ================= BALANCES ================= */
+async function refreshBalances() {
+  if (!userAddress) return;
 
-const VIN_SWAP_ABI = [
-  "function swapVINtoMON(uint256 vinAmount)",
-  "function swapMONtoVIN() payable",
-];
+  const [vinBal, monBal] = await Promise.all([
+    vinRead.balanceOf(userAddress),
+    provider.getBalance(userAddress),
+  ]);
 
-const VIN_DICE_ABI = [
-  "function play(uint256 amount, uint8 choice, uint256 clientSeed)",
-];
+  vinBalanceEl.textContent = formatVin(vinBal);
+  monBalanceEl.textContent = formatMon(monBal);
+}
 
-// =====================================================
-// SWAP (LEGACY UI HOOK)
-// =====================================================
-
-let swapContract;
-
+/* =================================================
+   SWAP
+   ================================================= */
 function initSwap() {
-  if (!provider) return;
+  const container = $("swap-container");
+  if (!container) return;
 
-  swapContract = new ethers.Contract(
-    VIN_SWAP_ADDRESS,
-    VIN_SWAP_ABI,
-    signer || provider
-  );
+  container.innerHTML = `
+    <input id="swapAmount" placeholder="VIN or MON" />
+    <button id="swapVinToMon">VIN → MON</button>
+    <button id="swapMonToVin">MON → VIN</button>
+    <div id="swapStatus" class="tx-status">–</div>
+  `;
 
-  // ⚠️ IMPORTANT:
-  // At this point, your ORIGINAL swap UI rendering logic
-  // should be pasted below.
-  //
-  // Example:
-  // renderSwapUI(swapContract);
+  $("swapVinToMon").onclick = async () => {
+    try {
+      const amt = parseVin($("swapAmount").value);
+      const allowance = await vinRead.allowance(userAddress, VIN_SWAP_ADDRESS);
+
+      if (allowance.lt(amt)) {
+        await (await vinWrite.approve(VIN_SWAP_ADDRESS, ethers.constants.MaxUint256)).wait();
+      }
+
+      $("swapStatus").textContent = "Swapping VIN → MON...";
+      await (await swapWrite.swapVINtoMON(amt)).wait();
+      $("swapStatus").textContent = "Done";
+      refreshBalances();
+    } catch (e) {
+      $("swapStatus").textContent = "Swap failed";
+    }
+  };
+
+  $("swapMonToVin").onclick = async () => {
+    try {
+      const amt = ethers.utils.parseEther($("swapAmount").value || "0");
+      $("swapStatus").textContent = "Swapping MON → VIN...";
+      await (await swapWrite.swapMONtoVIN({ value: amt })).wait();
+      $("swapStatus").textContent = "Done";
+      refreshBalances();
+    } catch {
+      $("swapStatus").textContent = "Swap failed";
+    }
+  };
 }
 
-// =====================================================
-// DICE (LEGACY UI HOOK)
-// =====================================================
-
-let diceContract;
-
+/* =================================================
+   DICE
+   ================================================= */
 function initDice() {
-  if (!provider) return;
+  const container = $("dice-container");
+  if (!container) return;
 
-  diceContract = new ethers.Contract(
-    VIN_DICE_ADDRESS,
-    VIN_DICE_ABI,
-    signer || provider
-  );
+  container.innerHTML = `
+    <input id="diceAmount" placeholder="VIN amount" />
+    <button id="diceEven">Even</button>
+    <button id="diceOdd">Odd</button>
+    <div id="diceStatus" class="tx-status">–</div>
+  `;
 
-  // ⚠️ IMPORTANT:
-  // Paste your ORIGINAL dice UI logic here.
-  //
-  // Example:
-  // renderDiceUI(diceContract);
+  async function play(choice) {
+    try {
+      const amt = parseVin($("diceAmount").value);
+      const allowance = await vinRead.allowance(userAddress, VIN_DICE_ADDRESS);
+
+      if (allowance.lt(amt)) {
+        await (await vinWrite.approve(VIN_DICE_ADDRESS, ethers.constants.MaxUint256)).wait();
+      }
+
+      $("diceStatus").textContent = "Rolling...";
+      await (await diceWrite.play(amt, choice, randomSeed())).wait();
+      $("diceStatus").textContent = "Done";
+      refreshBalances();
+    } catch {
+      $("diceStatus").textContent = "Failed";
+    }
+  }
+
+  $("diceEven").onclick = () => play(0);
+  $("diceOdd").onclick = () => play(1);
 }
 
-// =====================================================
-// AUTO INIT WHEN WALLET CONNECTED
-// =====================================================
+/* =================================================
+   LOTTO (Commit–Reveal)
+   ================================================= */
+function initLotto() {
+  const rows = $("lottoRows");
+  const status = $("lottoStatus");
+  const result = $("lottoResult");
 
-async function initGames() {
+  let secret;
+
+  function addRow(num = "", vin = "") {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input value="${num}" /></td>
+      <td><input value="${vin}" /></td>
+      <td><button class="remove">×</button></td>
+    `;
+    tr.querySelector(".remove").onclick = () => tr.remove();
+    rows.appendChild(tr);
+  }
+
+  $("lottoAdd").onclick = () => addRow();
+
+  $("lottoClear").onclick = () => {
+    rows.innerHTML = "";
+    result.textContent = "";
+  };
+
+  $("lottoPlay").onclick = async () => {
+    try {
+      const isBet27 =
+        document.querySelector("input[name=lottoType]:checked").value === "bet27";
+
+      const nums = [];
+      let total = ethers.BigNumber.from(0);
+
+      rows.querySelectorAll("tr").forEach((tr) => {
+        const n = Number(tr.children[0].firstElementChild.value);
+        const v = parseVin(tr.children[1].firstElementChild.value);
+        nums.push(n);
+        total = total.add(v);
+      });
+
+      secret = ethers.utils.hexlify(ethers.utils.randomBytes(32));
+      const commit = ethers.utils.keccak256(secret);
+
+      const allowance = await vinRead.allowance(userAddress, VIN_LOTTO_ADDRESS);
+      if (allowance.lt(total)) {
+        await (await vinWrite.approve(VIN_LOTTO_ADDRESS, ethers.constants.MaxUint256)).wait();
+      }
+
+      status.textContent = "Placing bet...";
+      await (await lottoWrite.placeBet(total, nums, commit, isBet27)).wait();
+
+      status.textContent = "Waiting blocks...";
+      setTimeout(async () => {
+        status.textContent = "Revealing...";
+        await (await lottoWrite.reveal(secret)).wait();
+        status.textContent = "Done";
+        refreshBalances();
+      }, 15000);
+    } catch {
+      status.textContent = "Lotto failed";
+    }
+  };
+
+  addRow();
+}
+
+/* ================= INIT ================= */
+async function init() {
+  if (!window.ethereum) return;
+  provider = new ethers.providers.Web3Provider(window.ethereum);
+  const accs = await provider.listAccounts();
+  if (accs.length) {
+    signer = provider.getSigner();
+    userAddress = accs[0];
+    walletAddressEl.textContent = shorten(userAddress);
+    connectBtn.textContent = "Connected";
+    initContracts();
+    refreshBalances();
+  }
+
   initSwap();
   initDice();
+  initLotto();
 }
 
-// Patch connectWallet to init games
-const _connectWallet = connectWallet;
-connectWallet = async function () {
-  await _connectWallet();
-  await initGames();
-};
+init();
