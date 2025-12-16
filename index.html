@@ -383,40 +383,44 @@
 
     <!-- VIN/USD chip: keep ONLY here (app.js must not touch this element) -->
     <script>
-      (function () {
-        const el = document.getElementById("vinUsdChip");
-        if (!el) return;
+  (function () {
+    const el = document.getElementById("vinUsdChip");
+    if (!el) return;
 
-        // Assumption: 1 VIN = 100 MON (fixed-rate utility)
-        // VIN/USD derived from MON/USD / 100
-        const MON_PER_VIN = 100;
+    // Fixed-rate swap: 1 VIN = 100 MON
+    // VIN/USD = MON/USD * 100
+    const MON_PER_VIN = 100;
 
-        async function fetchMonUsd() {
-          // CoinGecko simple price (no key)
-          const url =
-            "https://api.coingecko.com/api/v3/simple/price?ids=monad&vs_currencies=usd";
-          const r = await fetch(url, { cache: "no-store" });
-          if (!r.ok) throw new Error("price_fetch_failed");
-          const j = await r.json();
-          const monUsd = j && j.monad && j.monad.usd;
-          if (typeof monUsd !== "number") throw new Error("price_missing");
-          return monUsd;
-        }
+    async function fetchMonUsd() {
+      // CoinGecko simple price (no API key required)
+      const url =
+        "https://api.coingecko.com/api/v3/simple/price?ids=monad&vs_currencies=usd";
+      const r = await fetch(url, { cache: "no-store" });
+      if (!r.ok) throw new Error("price_fetch_failed");
+      const j = await r.json();
+      const monUsd = j && j.monad && j.monad.usd;
+      if (typeof monUsd !== "number") throw new Error("price_missing");
+      return monUsd;
+    }
 
-        async function tick() {
-          try {
-            el.textContent = "Loading...";
-            const monUsd = await fetchMonUsd();
-            const vinUsd = monUsd / MON_PER_VIN;
-            el.textContent = vinUsd.toFixed(2);
-          } catch (e) {
-            el.textContent = "—";
-          }
-        }
+    async function tick() {
+      try {
+        el.textContent = "Loading...";
+        const monUsd = await fetchMonUsd();
 
-        tick();
-        setInterval(tick, 30_000);
-      })();
-    </script>
+        // ✅ CORRECT calculation
+        const vinUsd = monUsd * MON_PER_VIN;
+
+        el.textContent = vinUsd.toFixed(2);
+      } catch (e) {
+        el.textContent = "—";
+      }
+    }
+
+    tick();
+    setInterval(tick, 30_000);
+  })();
+</script>
+
   </body>
 </html>
