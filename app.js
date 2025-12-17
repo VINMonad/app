@@ -900,7 +900,7 @@
       // optional: use maxBetAllowed
       let maxAllowed = null;
       try {
-        maxAllowed = await diceRead.maxBetAllowed(account);
+        maxAllowed = await diceRead.maxBetAllowed();
       } catch (_) {}
       const max = maxAllowed ? (bal.lt(maxAllowed) ? bal : maxAllowed) : bal;
       diceBetSet(ethers.utils.formatUnits(max, VIN_DECIMALS));
