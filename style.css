@@ -783,3 +783,10 @@ input {
     height: 38px;
   }
 }
+
+/* Connect button state */
+.btn-connect.connected {
+  border-color: rgba(36, 208, 138, 0.55);
+  background: rgba(36, 208, 138, 0.14);
+  color: rgba(255, 255, 255, 0.96);
+}
