@@ -1,326 +1,932 @@
-/* =========================
-   VINMonad - Global Styles
-   ========================= */
+/* =========================================
+   style.css — VINMonad
+   - All UI text is English (CSS has no text).
+   - Mobile-first. Smooth on desktop and phone.
+   - Works with current index.html classes/ids.
+   ========================================= */
 
-* {
-  box-sizing: border-box;
+/* ---------- CSS Variables ---------- */
+:root{
+  /* Base */
+  --bg: #0b1220;
+  --bg2: #070d18;
+
+  /* Surfaces */
+  --panel: rgba(255,255,255,.045);
+  --panel2: rgba(255,255,255,.065);
+  --border: rgba(255,255,255,.12);
+  --border2: rgba(255,255,255,.085);
+
+  /* Text */
+  --text: rgba(255,255,255,.92);
+  --text2: rgba(255,255,255,.78);
+  --muted: rgba(255,255,255,.64);
+  --muted2: rgba(255,255,255,.52);
+
+  /* Brand */
+  --accent: rgba(53,133,255,.95);
+  --accent2: rgba(53,133,255,.18);
+
+  /* States */
+  --good: rgba(36,208,138,.95);
+  --good2: rgba(36,208,138,.16);
+
+  --bad: rgba(255,90,90,.95);
+  --bad2: rgba(255,90,90,.16);
+
+  --warn: rgba(255,196,0,.95);
+  --warn2: rgba(255,196,0,.16);
+
+  /* Geometry */
+  --radius: 16px;
+  --radius2: 22px;
+
+  /* Shadows */
+  --shadow: 0 16px 40px rgba(0,0,0,.34);
+  --shadow2: 0 10px 28px rgba(0,0,0,.28);
+
+  /* Layout */
+  --maxw: 1120px;
+
+  /* Interaction */
+  --tap: 44px; /* minimum touch target */
 }
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  background: #0b1220;
-  color: #e8ecf3;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
+/* ---------- Reset / Base ---------- */
+*{ box-sizing:border-box; }
+html, body{ height:100%; }
+
+html{
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
 }
 
-a {
+body{
+  margin:0;
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+    "Apple Color Emoji","Segoe UI Emoji";
+  background:
+    radial-gradient(1200px 820px at 16% -10%, rgba(53,133,255,.18), transparent 55%),
+    radial-gradient(1100px 740px at 86% -10%, rgba(36,208,138,.10), transparent 55%),
+    radial-gradient(850px 550px at 50% 110%, rgba(255,255,255,.05), transparent 60%),
+    var(--bg);
+}
+
+a{ color:inherit; text-decoration:none; }
+img{ max-width:100%; display:block; }
+
+button{
+  border:none;
+  background:transparent;
+  color:inherit;
+  font: inherit;
+  cursor:pointer;
+}
+
+button:disabled{
+  cursor:not-allowed;
+  opacity:.55;
+}
+
+input{
+  font: inherit;
   color: inherit;
-  text-decoration: none;
-}
-
-button {
-  cursor: pointer;
-  border: none;
-  background: none;
-  color: inherit;
-}
-
-input {
-  font-family: inherit;
-  font-size: 16px;
   background: transparent;
-  color: #fff;
   border: none;
   outline: none;
 }
 
-/* =========================
-   Layout
-   ========================= */
-
-.app-shell {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+::selection{
+  background: rgba(53,133,255,.28);
 }
 
-.main-content {
-  flex: 1;
-  padding: 14px;
-  max-width: 1100px;
+/* ---------- Shell ---------- */
+.app-shell{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+/* Keep main readable on large screens */
+.main-content{
+  flex:1;
+  width:100%;
+  max-width: var(--maxw);
   margin: 0 auto;
+  padding: 16px 14px 20px;
 }
 
-/* =========================
-   Top Navigation
-   ========================= */
+/* ---------- Top Nav (Sticky) ---------- */
+.top-nav{
+  position: sticky;
+  top: 0;
+  z-index: 50;
 
-.top-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+
+  background: rgba(8,12,22,.70);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-.brand {
-  display: flex;
-  align-items: center;
+/* Brand */
+.brand{
+  display:flex;
+  align-items:center;
   gap: 10px;
+  padding: 6px 8px;
+  border-radius: 12px;
 }
 
-.brand-logo {
+.brand:hover{
+  background: rgba(255,255,255,.06);
+}
+
+.brand-logo{
   width: 36px;
   height: 36px;
-}
-
-.brand-title {
-  font-weight: 700;
-}
-
-.brand-subtitle {
-  font-size: 12px;
-  color: #9aa4bf;
-}
-
-.nav-links {
-  display: flex;
-  gap: 8px;
-}
-
-.nav-link {
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 14px;
-  color: #9aa4bf;
-}
-
-.nav-link.active {
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-}
-
-.nav-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* =========================
-   Buttons
-   ========================= */
-
-.btn {
-  padding: 10px 14px;
   border-radius: 10px;
-  font-weight: 600;
-  font-size: 14px;
-  text-align: center;
+  box-shadow: 0 10px 20px rgba(0,0,0,.25);
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
+.brand-text{ display:flex; flex-direction:column; line-height:1.1; }
+.brand-title{ font-weight: 900; letter-spacing:.2px; }
+.brand-subtitle{ font-size:12px; color: var(--muted); margin-top:2px; }
+
+/* Nav tabs */
+.nav-links{
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-.btn-secondary {
-  background: rgba(255, 255, 255, 0.08);
-}
+.nav-link{
+  min-height: 36px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid transparent;
 
-.btn-outline {
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.btn-connect.connected {
-  background: rgba(34, 197, 94, 0.15);
-  border: 1px solid rgba(34, 197, 94, 0.6);
-  color: #4ade80;
-}
-
-.btn-mini {
-  padding: 6px 10px;
+  font-weight: 900;
   font-size: 13px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.08);
+  color: var(--muted);
+
+  transition: background .12s ease, color .12s ease, border-color .12s ease, transform .12s ease;
 }
 
-/* =========================
-   Screens
-   ========================= */
-
-.screen {
-  display: none;
+.nav-link:hover{
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.92);
 }
 
-.screen-active {
-  display: block;
+.nav-link.active{
+  background: rgba(53,133,255,.16);
+  border-color: rgba(53,133,255,.42);
+  color: rgba(255,255,255,.96);
 }
 
-.screen-header {
-  margin-bottom: 14px;
+/* Right side */
+.nav-right{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-.screen-header h1 {
-  margin: 0;
-  font-size: 22px;
+/* Price chip */
+.price-chip{
+  display:inline-flex;
+  align-items:center;
+  gap: 6px;
+
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.04);
 }
 
-.screen-subtitle {
-  font-size: 14px;
-  color: #9aa4bf;
+.price-label{
+  font-size: 12px;
+  color: var(--muted2);
+  font-weight: 800;
 }
 
-/* =========================
-   Cards & Panels
-   ========================= */
-
-.grid-2 {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
+.price-value{
+  font-size: 13px;
+  font-weight: 1000;
+  letter-spacing: .2px;
 }
 
-@media (min-width: 768px) {
-  .grid-2 {
-    grid-template-columns: 1fr 1fr;
-  }
+/* Network indicator */
+.network-indicator{
+  display:inline-flex;
+  align-items:center;
+  gap: 8px;
+
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.04);
 }
 
-.card,
-.panel {
-  background: #111a2e;
+.dot{
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  display:inline-block;
+}
+
+.dot-disconnected{ background: rgba(255,80,80,.90); }
+.dot-connected{ background: rgba(36,208,138,.95); }
+
+.network-label{
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 900;
+}
+
+/* ---------- Buttons ---------- */
+.btn{
+  min-height: 40px;
+  padding: 9px 12px;
   border-radius: 14px;
+
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.04);
+
+  font-weight: 950;
+  letter-spacing: .2px;
+  color: rgba(255,255,255,.94);
+
+  transition: background .12s ease, border-color .12s ease, transform .12s ease, box-shadow .12s ease;
+}
+
+.btn:hover{
+  background: rgba(255,255,255,.07);
+}
+
+.btn:active{
+  transform: translateY(1px);
+}
+
+.btn-primary{
+  background: rgba(53,133,255,.18);
+  border-color: rgba(53,133,255,.45);
+}
+
+.btn-primary:hover{
+  background: rgba(53,133,255,.24);
+}
+
+.btn-secondary{
+  background: rgba(255,255,255,.04);
+}
+
+.btn-outline{
+  background: transparent;
+}
+
+.btn-mini{
+  min-height: 36px;
+  padding: 7px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.03);
+  font-weight: 950;
+}
+
+.btn-mini:hover{
+  background: rgba(255,255,255,.06);
+}
+
+/* Connect button state */
+.btn-connect.connected{
+  border-color: rgba(36,208,138,.55);
+  background: rgba(36,208,138,.14);
+  color: rgba(255,255,255,.96);
+}
+
+/* ---------- Screens ---------- */
+.screen{
+  display:none;
+  animation: fadeIn .14s ease-out;
+}
+.screen-active{ display:block; }
+
+@keyframes fadeIn{
+  from{ opacity:.72; transform: translateY(4px); }
+  to{ opacity:1; transform: translateY(0); }
+}
+
+.screen-header{
+  margin: 10px 2px 14px;
+}
+.screen-header.compact{
+  margin-top: 6px;
+}
+
+h1{
+  margin:0;
+  font-size: 24px;
+  letter-spacing: .2px;
+}
+
+.screen-subtitle{
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+/* ---------- Grid ---------- */
+.grid-2{
+  display:grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 860px){
+  .grid-2{ grid-template-columns: 1fr; }
+}
+
+/* ---------- Panels / Cards ---------- */
+.card,
+.panel{
+  background: rgba(255,255,255,.035);
+  border: 1px solid var(--border);
+  border-radius: var(--radius2);
+  box-shadow: var(--shadow);
   padding: 14px;
 }
 
 .card-title,
-.panel-title {
-  font-weight: 700;
+.panel-title{
+  margin-bottom: 10px;
+  font-weight: 1000;
+  letter-spacing: .2px;
+}
+
+/* ---------- Key-Value blocks ---------- */
+.kv{
+  display:grid;
+  gap: 10px;
+}
+
+.kv-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 14px;
+
+  padding: 10px 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.03);
+}
+
+.kv-k{
+  color: var(--muted);
+  font-weight: 900;
+  font-size: 13px;
+}
+
+.kv-v{
+  color: rgba(255,255,255,.94);
+  font-weight: 1000;
+  font-size: 13px;
+  text-align:right;
+  word-break: break-word;
+}
+
+/* ---------- Home actions ---------- */
+.actions-row{
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.actions-row .btn{
+  flex: 1 1 auto;
+}
+
+@media (max-width: 520px){
+  .actions-row .btn{
+    flex: 1 1 calc(50% - 10px);
+  }
+}
+
+/* ---------- Hint / text helpers ---------- */
+.hint{
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.muted{
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.strong{ font-weight: 1000; }
+.center{ text-align:center; }
+
+/* ---------- Forms ---------- */
+.form{
+  display:grid;
+  gap: 12px;
+}
+
+.form-row{
+  display:grid;
+  gap: 8px;
+}
+
+.form-label-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 10px;
+}
+
+.input-row{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+}
+
+input[type="text"]{
+  flex: 1;
+  min-height: var(--tap);
+
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 14px;
+
+  background: rgba(0,0,0,.25);
+  color: rgba(255,255,255,.95);
+
+  padding: 11px 12px;
+  font-weight: 950;
+}
+
+input[type="text"]::placeholder{
+  color: rgba(255,255,255,.35);
+}
+
+input[type="text"]:focus{
+  border-color: rgba(53,133,255,.45);
+  box-shadow: 0 0 0 4px rgba(53,133,255,.12);
+}
+
+/* Chip-like element */
+.chip{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  min-height: 38px;
+  padding: 9px 12px;
+
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.05);
+
+  font-weight: 1000;
+  letter-spacing: .2px;
+}
+
+/* ---------- Tabs ---------- */
+.tabs{
+  display:flex;
+  gap: 8px;
+  flex-wrap: wrap;
   margin-bottom: 10px;
 }
 
-/* =========================
-   Key-Value
-   ========================= */
+.tab{
+  min-height: 40px;
+  padding: 9px 12px;
 
-.kv {
-  display: flex;
-  flex-direction: column;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.14);
+
+  background: rgba(255,255,255,.03);
+  color: var(--muted);
+
+  font-weight: 1000;
+  cursor:pointer;
+
+  transition: background .12s ease, border-color .12s ease, color .12s ease;
+}
+
+.tab:hover{
+  background: rgba(255,255,255,.06);
+  color: var(--text);
+}
+
+.tab.active{
+  background: rgba(53,133,255,.16);
+  border-color: rgba(53,133,255,.42);
+  color: rgba(255,255,255,.96);
+}
+
+/* ---------- Status box ---------- */
+.status{
+  padding: 12px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.03);
+  color: rgba(255,255,255,.90);
+  font-weight: 950;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.status.good{
+  border-color: rgba(36,208,138,.35);
+  background: rgba(36,208,138,.10);
+}
+
+.status.bad{
+  border-color: rgba(255,90,90,.35);
+  background: rgba(255,90,90,.10);
+}
+
+/* ---------- Dice: Choice buttons ---------- */
+.choice-row{
+  display:flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.chip-choice{
+  flex: 1;
+  min-height: var(--tap);
+
+  text-align:center;
+  user-select:none;
+
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 14px;
+
+  background: rgba(255,255,255,.03);
+  color: rgba(255,255,255,.88);
+
+  font-weight: 1000;
+  letter-spacing: .2px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  transition: background .12s ease, border-color .12s ease, box-shadow .12s ease, transform .12s ease;
+}
+
+.chip-choice:hover{
+  background: rgba(255,255,255,.06);
+}
+
+.chip-choice:active{
+  transform: translateY(1px);
+}
+
+/* Clear "active" state for Even/Odd */
+.chip-choice.active{
+  background: rgba(53,133,255,.22);
+  border-color: rgba(53,133,255,.52);
+  box-shadow: 0 0 0 4px rgba(53,133,255,.14);
+  color: rgba(255,255,255,.98);
+}
+
+/* ---------- Dice: Quick buttons row (1/2, x2, Clear, MAX) ---------- */
+.quick-row{
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.quick-row .btn-mini{
+  flex: 1 1 auto;
+}
+
+@media (max-width: 520px){
+  .quick-row .btn-mini{
+    flex: 1 1 calc(33.333% - 10px);
+  }
+}
+
+/* ---------- Dice Bowl + Coins (Xóc đĩa) ---------- */
+.dice-bowl{
+  margin: 10px 0 6px;
+
+  border-radius: var(--radius2);
+  border: 1px solid rgba(255,255,255,.10);
+
+  background:
+    radial-gradient(420px 260px at 50% 40%, rgba(255,255,255,.06), rgba(0,0,0,.18)),
+    linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.10));
+
+  padding: 14px;
+  box-shadow: var(--shadow2);
+}
+
+.dice-coins{
+  width:100%;
+  max-width: 320px;
+  margin: 0 auto;
+
+  display:grid;
+  grid-template-columns: repeat(2, 84px);
+  grid-template-rows: repeat(2, 84px);
+  justify-content:center;
+  gap: 12px;
+}
+
+/* Coin base */
+.coin{
+  width: 84px;
+  height: 84px;
+  border-radius: 999px;
+
+  border: 2px solid rgba(255,255,255,.16);
+  box-shadow: 0 18px 28px rgba(0,0,0,.35);
+
+  background: radial-gradient(circle at 28% 28%, rgba(255,255,255,.92), rgba(220,220,220,.86));
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle highlight ring */
+.coin::after{
+  content:"";
+  position:absolute;
+  inset: 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.18);
+  opacity: .8;
+}
+
+/* White coin */
+.coin-white{
+  background:
+    radial-gradient(circle at 30% 28%, rgba(255,255,255,.96), rgba(215,215,215,.86));
+}
+
+/* Red coin */
+.coin-red{
+  background:
+    radial-gradient(circle at 30% 28%, rgba(255,90,90,.96), rgba(170,30,30,.90));
+}
+
+/* Shake animation:
+   - In app.js, keep class .is-shaking from click until receipt arrives. */
+.dice-coins.is-shaking .coin{
+  animation: shake 620ms ease-in-out infinite;
+}
+
+@keyframes shake{
+  0%   { transform: translate(0,0) rotate(0deg); }
+  15%  { transform: translate(-4px, 3px) rotate(-6deg); }
+  30%  { transform: translate(5px,-3px) rotate(7deg); }
+  45%  { transform: translate(-3px,-4px) rotate(-5deg); }
+  60%  { transform: translate(4px, 3px) rotate(6deg); }
+  75%  { transform: translate(-2px, 2px) rotate(-4deg); }
+  100% { transform: translate(0,0) rotate(0deg); }
+}
+
+/* On small screens: larger coins for better visual */
+@media (max-width: 420px){
+  .dice-coins{
+    grid-template-columns: repeat(2, 92px);
+    grid-template-rows: repeat(2, 92px);
+    gap: 12px;
+  }
+  .coin{
+    width: 92px;
+    height: 92px;
+  }
+}
+
+/* ---------- Win/Lose text helpers ---------- */
+.win{
+  color: var(--good);
+  font-weight: 1100;
+}
+
+.lose{
+  color: var(--bad);
+  font-weight: 1100;
+}
+
+/* ---------- Lotto Layout ---------- */
+.rows-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.rows-title{
+  font-weight: 1100;
+  letter-spacing: .2px;
+}
+
+.rows-actions{
+  display:flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.rows{
+  display:grid;
+  gap: 10px;
+}
+
+.row{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@media (max-width: 520px){
+  .row{ grid-template-columns: 1fr; }
+}
+
+.row-col{
+  display:grid;
   gap: 6px;
 }
 
-.kv-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
+.mini-label{
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 950;
 }
 
-.kv-k {
-  color: #9aa4bf;
-}
-
-/* =========================
-   Dice
-   ========================= */
-
-.choice-row {
-  display: flex;
-  gap: 10px;
-  margin: 12px 0;
-}
-
-.chip-choice {
-  flex: 1;
-  padding: 10px;
-  border-radius: 12px;
-  text-align: center;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.chip-choice.active {
-  background: linear-gradient(135deg, #22c55e, #16a34a);
-}
-
-.dice-bowl {
-  margin: 14px 0;
-  padding: 18px;
-  background: #0b1220;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-}
-
-.dice-coins {
-  display: grid;
-  grid-template-columns: repeat(2, 44px);
+.meta-row{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
   gap: 10px;
 }
 
-.coin {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 2px solid #333;
-}
-
-.coin-white {
-  background: #f1f5f9;
-}
-
-.coin-red {
-  background: #dc2626;
-}
-
-/* =========================
-   Dice Result
-   ========================= */
-
-.win {
-  color: #22c55e;
-  font-weight: 700;
-}
-
-.lose {
-  color: #ef4444;
-  font-weight: 700;
-}
-
-/* =========================
-   Footer
-   ========================= */
-
-.footer {
-  padding: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.footer-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-}
-
-.footer-pill {
-  padding: 6px 10px;
-  font-size: 13px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-/* =========================
-   Utilities
-   ========================= */
-
-.hint {
-  font-size: 13px;
-  color: #9aa4bf;
-  margin-top: 8px;
-}
-
-.status {
+.panel-sub{
   margin-top: 10px;
-  font-size: 14px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.panel-sub-title{
+  font-weight: 1100;
+  margin-bottom: 6px;
+}
+
+/* Lotto result pills (27 numbers) */
+.lotto-results{
+  display:grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+@media (max-width: 720px){
+  .lotto-results{
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 420px){
+  .lotto-results{
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 7px;
+  }
+}
+
+.lotto-pill{
+  padding: 8px 0;
+  text-align:center;
+
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.12);
+
+  background: rgba(255,255,255,.03);
+  font-weight: 1100;
+  letter-spacing: .2px;
+}
+
+/* Optional highlight states */
+.lotto-pill.win{
+  border-color: rgba(36,208,138,.35);
+  background: rgba(36,208,138,.10);
+}
+.lotto-pill.lose{
+  border-color: rgba(255,90,90,.35);
+  background: rgba(255,90,90,.10);
+}
+
+/* ---------- Footer (Sticky bottom) ---------- */
+.footer{
+  border-top: 1px solid var(--border);
+  background: rgba(8,12,22,.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  padding: 10px 12px;
+}
+
+/* Sticky footer only when you want it */
+.footer-compact{
+  position: sticky;
+  bottom: 0;
+  z-index: 40;
+  /* safe area for iPhone */
+  padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+}
+
+.footer-links{
+  max-width: var(--maxw);
+  margin: 0 auto;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.footer-pill{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  min-height: 34px;
+  padding: 8px 12px;
+
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.03);
+
+  color: rgba(255,255,255,.92);
+  font-weight: 1000;
+  font-size: 12px;
+
+  transition: background .12s ease, transform .12s ease;
+}
+
+.footer-pill:hover{
+  background: rgba(255,255,255,.06);
+}
+
+.footer-pill:active{
+  transform: translateY(1px);
+}
+
+@media (max-width: 420px){
+  .footer-links{
+    gap: 8px;
+  }
+  .footer-pill{
+    padding: 7px 10px;
+    font-size: 12px;
+  }
+}
+
+/* ---------- Desktop Enhancements ---------- */
+@media (min-width: 980px){
+  .top-nav{
+    padding: 12px 18px;
+  }
+  .main-content{
+    padding: 18px 16px 22px;
+  }
+  h1{ font-size: 26px; }
+  .card, .panel{ padding: 16px; }
+}
+
+/* ---------- Accessibility ---------- */
+:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(53,133,255,.22);
+  border-radius: 12px;
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce){
+  *{
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
