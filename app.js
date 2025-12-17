@@ -55,7 +55,7 @@
     "function play(uint256 amount, uint8 choice, uint256 clientSeed)",
     "function MIN_BET() view returns(uint256)",
     "function MAX_BET() view returns(uint256)",
-    "function maxBetAllowed(address player) view returns(uint256)",
+    "function maxBetAllowed() view returns(uint256)",
   ];
 
   // VINLottoV2 ABI (matches your uploaded ABI)
