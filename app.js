@@ -780,7 +780,7 @@
         [minBet, maxBet, maxAllowed] = await Promise.all([
           diceRead.MIN_BET(),
           diceRead.MAX_BET(),
-          diceRead.maxBetAllowed(account),
+          diceRead.maxBetAllowed(),
         ]);
       } catch (_) {}
 
