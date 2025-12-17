@@ -1160,6 +1160,15 @@
       setStatus(statusEl, "Waiting result...");
 
       const receipt = await tx.wait();
+       // RESET LOTTO UI STATE (FIX FAILED AFTER FEW PLAYS)
+      const root = document.getElementById("lottoRows");
+      if (root) {
+        root.innerHTML = "";
+        addLottoRow();
+      }
+
+      setText("lottoTotalBet", "-");
+      setText("lottoBetSummary", "No bet yet"); 
 
       // parse Played event
       let played = null;
