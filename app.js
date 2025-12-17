@@ -401,7 +401,7 @@
       const [min, max, maxAllowed] = await Promise.all([
         diceRead.MIN_BET(),
         diceRead.MAX_BET(),
-        diceRead.maxBetAllowed(account),
+        diceRead.maxBetAllowed(),
       ]);
       const minS = formatUnits(min, VIN_DECIMALS, 6);
       const maxS = formatUnits(max, VIN_DECIMALS, 0);
