@@ -24,7 +24,7 @@
   const APPROVE_VIN_AMOUNT = "1000000"; // 1,000,000 VIN
 
   // -----------------------------
-  // Minimal ABIs
+  // Minimal ABIs (embedded)
   // -----------------------------
   const ERC20_ABI = [
     "function decimals() view returns (uint8)",
@@ -33,7 +33,10 @@
     "function approve(address spender, uint256 amount) returns (bool)",
   ];
 
-  const SWAP_ABI = ["function swapVINtoMON(uint256 vinAmount)", "function swapMONtoVIN() payable"];
+  const SWAP_ABI = [
+    "function swapVINtoMON(uint256 vinAmount)",
+    "function swapMONtoVIN() payable",
+  ];
 
   const DICE_ABI = [
     "event Played(address indexed player,uint256 amount,uint8 choice,uint8 diceResult,uint16 roll,bool won)",
@@ -69,14 +72,23 @@
   let diceChoice = 0; // 0 EVEN, 1 ODD
   let lottoBet27 = false;
 
+  // Dice shaking controller
+  let diceShakeTimer = null;
+  let diceShakeRunning = false;
+
   // -----------------------------
-  // DOM
+  // DOM helpers
   // -----------------------------
   const $ = (id) => document.getElementById(id);
 
   function setText(id, txt) {
     const el = $(id);
     if (el) el.textContent = txt;
+  }
+
+  function setHTML(id, html) {
+    const el = $(id);
+    if (el) el.innerHTML = html;
   }
 
   function shortAddr(a) {
@@ -124,6 +136,12 @@
     btn.title = connected ? addr : "Connect wallet";
   }
 
+  function setWinLoseClass(el, won) {
+    if (!el) return;
+    el.classList.remove("win", "lose");
+    el.classList.add(won ? "win" : "lose");
+  }
+
   // -----------------------------
   // Screens
   // -----------------------------
@@ -148,28 +166,7 @@
   }
 
   // -----------------------------
-  // Contracts init
-  // -----------------------------
-  async function initContracts() {
-    if (!provider) return;
-
-    vinRead = new ethers.Contract(ADDR_VIN, ERC20_ABI, provider);
-    swapRead = new ethers.Contract(ADDR_SWAP, SWAP_ABI, provider);
-    diceRead = new ethers.Contract(ADDR_DICE, DICE_ABI, provider);
-    lottoRead = new ethers.Contract(ADDR_LOTTO, LOTTO_ABI, provider);
-
-    vinDecimals = await vinRead.decimals().catch(() => 18);
-
-    if (signer) {
-      vinWrite = vinRead.connect(signer);
-      swapWrite = swapRead.connect(signer);
-      diceWrite = diceRead.connect(signer);
-      lottoWrite = lottoRead.connect(signer);
-    }
-  }
-
-  // -----------------------------
-  // Wallet connect
+  // Chain / Wallet readiness
   // -----------------------------
   async function ensureMonadChain() {
     if (!window.ethereum) return false;
@@ -203,24 +200,63 @@
     }
   }
 
-  async function connectWallet() {
+  async function initContracts() {
+    if (!provider) return;
+
+    vinRead = new ethers.Contract(ADDR_VIN, ERC20_ABI, provider);
+    swapRead = new ethers.Contract(ADDR_SWAP, SWAP_ABI, provider);
+    diceRead = new ethers.Contract(ADDR_DICE, DICE_ABI, provider);
+    lottoRead = new ethers.Contract(ADDR_LOTTO, LOTTO_ABI, provider);
+
+    vinDecimals = await vinRead.decimals().catch(() => 18);
+
+    if (signer) {
+      vinWrite = vinRead.connect(signer);
+      swapWrite = swapRead.connect(signer);
+      diceWrite = diceRead.connect(signer);
+      lottoWrite = lottoRead.connect(signer);
+    }
+  }
+
+  // This function is the “fix” for your issue #1:
+  // It ensures chain, provider/signer/contracts are ready BEFORE we send tx,
+  // and “wakes up” MetaMask once to avoid first-play random failure.
+  async function ensureReadyForTx() {
     if (!window.ethereum) {
       alert("MetaMask not found.");
-      return;
+      return false;
     }
 
     const ok = await ensureMonadChain();
     if (!ok) {
       alert("Please switch to Monad (chainId 143) in MetaMask.");
-      return;
+      return false;
     }
 
+    // Always recreate provider/signer before tx (prevents stale signer issues)
     provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-    await provider.send("eth_requestAccounts", []);
     signer = provider.getSigner();
 
-    account = await signer.getAddress();
+    // Warm-up MetaMask state (prevents first-call weirdness)
+    try {
+      await provider.send("eth_accounts", []);
+    } catch (_) {}
 
+    // If no account yet, request it
+    try {
+      const accounts = await provider.send("eth_requestAccounts", []);
+      if (!accounts || !accounts.length) return false;
+    } catch (e) {
+      return false;
+    }
+
+    try {
+      account = await signer.getAddress();
+    } catch (e) {
+      return false;
+    }
+
+    // Update UI basics
     setNetworkUI(true, "Monad");
     setConnectButtonUI(true, account);
     setText("walletShort", shortAddr(account));
@@ -229,6 +265,12 @@
     setText("lottoWallet", shortAddr(account));
 
     await initContracts();
+    return true;
+  }
+
+  async function connectWallet() {
+    const ok = await ensureReadyForTx();
+    if (!ok) return;
     await refreshAll();
   }
 
@@ -275,7 +317,10 @@
   async function refreshBalances() {
     if (!provider || !account || !vinRead) return;
 
-    const [monBal, vinBal] = await Promise.all([provider.getBalance(account), vinRead.balanceOf(account)]);
+    const [monBal, vinBal] = await Promise.all([
+      provider.getBalance(account),
+      vinRead.balanceOf(account),
+    ]);
 
     setText("homeMonBal", formatUnitsSafe(monBal, 18, 4) + " MON");
     setText("homeVinBal", formatUnitsSafe(vinBal, vinDecimals, 4) + " VIN");
@@ -299,9 +344,12 @@
   }
 
   async function refreshPools() {
-    if (!vinRead || !provider) return;
+    if (!vinRead) return;
 
-    const [diceVin, lottoVin] = await Promise.all([vinRead.balanceOf(ADDR_DICE), vinRead.balanceOf(ADDR_LOTTO)]);
+    const [diceVin, lottoVin] = await Promise.all([
+      vinRead.balanceOf(ADDR_DICE),
+      vinRead.balanceOf(ADDR_LOTTO),
+    ]);
 
     setText("homeDicePool", formatUnitsSafe(diceVin, vinDecimals, 4) + " VIN");
     setText("homeLottoPool", formatUnitsSafe(lottoVin, vinDecimals, 4) + " VIN");
@@ -340,15 +388,22 @@
       const [minB, maxB] = await Promise.all([diceRead.MIN_BET(), diceRead.MAX_BET()]);
       setText(
         "diceMinMax",
-        `Min ${formatUnitsSafe(minB, vinDecimals, 2)} / Max ${formatUnitsSafe(maxB, vinDecimals, 2)}`
+        `Min ${formatUnitsSafe(minB, vinDecimals, 6)} / Max ${formatUnitsSafe(maxB, vinDecimals, 4)}`
       );
     } catch (_) {
-      setText("diceMinMax", "Min 1 / Max 50");
+      // fallback text if contract read fails
+      setText("diceMinMax", "Min - / Max -");
     }
   }
 
   async function refreshAll() {
-    await Promise.allSettled([refreshPools(), refreshBalances(), refreshAllowances(), refreshDiceLimits()]);
+    await Promise.allSettled([
+      refreshPools(),
+      refreshBalances(),
+      refreshAllowances(),
+      refreshDiceLimits(),
+    ]);
+
     const hint = $("homeHint");
     if (hint) hint.textContent = account ? "Connected ✓" : "Connect your wallet to load balances.";
   }
@@ -413,7 +468,13 @@
   }
 
   async function approveVIN(spender, statusId) {
+    const ok = await ensureReadyForTx();
+    if (!ok) {
+      alert("Please connect wallet first.");
+      return;
+    }
     if (!vinWrite || !account) return;
+
     try {
       setText(statusId, "Approving...");
       const amt = ethers.utils.parseUnits(APPROVE_VIN_AMOUNT, vinDecimals);
@@ -430,10 +491,12 @@
   }
 
   async function doSwap() {
-    if (!swapWrite || !account || !provider) {
+    const ok = await ensureReadyForTx();
+    if (!ok) {
       alert("Please connect wallet first.");
       return;
     }
+    if (!swapWrite || !account || !provider) return;
 
     const fromEl = $("swapFromAmt");
     const amtBN =
@@ -481,28 +544,63 @@
     }
   }
 
+  function shuffleArray(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
   function randomEvenPattern() {
-    const patterns = [
-      ["white", "white", "white", "white"], // 4 white
-      ["red", "red", "red", "red"], // 4 red
-      ["white", "white", "red", "red"], // 2-2
-    ];
-    return patterns[Math.floor(Math.random() * patterns.length)];
+    // EVEN types: 4 white, 4 red, 2-2 (shuffled)
+    const pick = Math.floor(Math.random() * 3);
+    if (pick === 0) return ["white", "white", "white", "white"];
+    if (pick === 1) return ["red", "red", "red", "red"];
+    // 2 white + 2 red, shuffle positions
+    return shuffleArray(["white", "white", "red", "red"]);
   }
 
   function randomOddPattern() {
-    const patterns = [
-      ["red", "white", "white", "white"], // 1 red
-      ["red", "red", "red", "white"], // 3 red
-    ];
-    return patterns[Math.floor(Math.random() * patterns.length)];
+    // ODD types: 1 red, 3 red (shuffled)
+    const pick = Math.floor(Math.random() * 2);
+    if (pick === 0) return shuffleArray(["red", "white", "white", "white"]); // 1 red
+    return shuffleArray(["red", "red", "red", "white"]); // 3 red
   }
 
-  function shakeCoins() {
+  function startDiceShake() {
     const box = $("diceCoins");
     if (!box) return;
-    box.classList.add("shake");
-    setTimeout(() => box.classList.remove("shake"), 650);
+
+    // Prefer CSS class "is-shaking" if your style.css uses it
+    box.classList.add("is-shaking");
+
+    // Also keep a tiny “jitter refresh” to make sure it keeps animating
+    // (some browsers pause animations in rare cases)
+    diceShakeRunning = true;
+    if (diceShakeTimer) clearInterval(diceShakeTimer);
+    diceShakeTimer = setInterval(() => {
+      if (!diceShakeRunning) return;
+      // Toggle a helper class to retrigger if needed
+      box.classList.remove("shake");
+      // force reflow
+      void box.offsetWidth;
+      box.classList.add("shake");
+    }, 700);
+  }
+
+  function stopDiceShake() {
+    const box = $("diceCoins");
+    if (box) {
+      box.classList.remove("is-shaking");
+      box.classList.remove("shake");
+    }
+    diceShakeRunning = false;
+    if (diceShakeTimer) {
+      clearInterval(diceShakeTimer);
+      diceShakeTimer = null;
+    }
   }
 
   function setDiceChoice(c) {
@@ -551,11 +649,40 @@
     } catch (_) {}
   }
 
+  function renderDiceResultDetail({ onchainResultEven, playerChoiceEven, won, payoutBN, hash }) {
+    const resultTxt = onchainResultEven ? "EVEN" : "ODD";
+    const choiceTxt = playerChoiceEven ? "EVEN" : "ODD";
+    const payoutVin = payoutBN ? Number(ethers.utils.formatUnits(payoutBN, vinDecimals)) : 0;
+
+    const statusLine = won ? "WIN" : "LOSE";
+    const payoutLine = won
+      ? `Payout: ${payoutVin.toLocaleString(undefined, { maximumFractionDigits: 6 })} VIN`
+      : "Payout: 0 VIN";
+
+    // Use HTML lines for clarity
+    const html =
+      `<div><b>Result:</b> ${resultTxt}</div>` +
+      `<div><b>Your choice:</b> ${choiceTxt}</div>` +
+      `<div><b>Status:</b> <span class="${won ? "win" : "lose"}">${statusLine}</span></div>` +
+      `<div><b>${payoutLine}</b></div>` +
+      `<div><b>Hash:</b> ${hash || "-"}</div>`;
+
+    setHTML("diceResult", html);
+
+    const diceResultEl = $("diceResult");
+    if (diceResultEl) setWinLoseClass(diceResultEl, !!won);
+
+    setText("diceHash", hash ? "Hash: " + hash : "Hash: -");
+  }
+
   async function doDicePlay() {
-    if (!diceWrite || !account) {
+    // Fix #1: ensure everything ready before tx (prevents first-play error)
+    const ok = await ensureReadyForTx();
+    if (!ok) {
       alert("Please connect wallet first.");
       return;
     }
+    if (!diceWrite || !account) return;
 
     const amtEl = $("diceBetAmt");
     const amountBN = toWeiSafe(amtEl ? amtEl.value : "", vinDecimals);
@@ -564,27 +691,34 @@
       return;
     }
 
+    // Reset result UI
+    setText("diceStatus", "Preparing...");
+    setText("diceHash", "-");
+    setHTML("diceResult", "-");
+
+    const diceResultEl = $("diceResult");
+    if (diceResultEl) diceResultEl.classList.remove("win", "lose");
+
+    // Fix #2: shake from click -> after user signs -> mined -> result
+    startDiceShake();
+
     try {
-      setText("diceStatus", "Sending transaction...");
-      setText("diceResult", "-");
-      setText("diceHash", "-");
-
-      // pre-visual shake
-      shakeCoins();
-
+      // Create clientSeed
       const clientSeed = Math.floor(Math.random() * 1e12);
+
+      setText("diceStatus", "Waiting for wallet signature...");
+
+      // Send tx (MetaMask popup happens here)
       const tx = await diceWrite.play(amountBN, diceChoice, clientSeed);
-      setText("diceStatus", "Waiting confirm...");
+
+      setText("diceStatus", "Transaction sent. Waiting confirm...");
+
       const rc = await tx.wait();
-
       const blockHash = rc.blockHash || "-";
-      setText("diceHash", "Hash: " + blockHash);
 
-      // Parse Played
-      let resultLine = "Done ✓";
-      let isEvenResult = null;
+      // Parse Played event
+      let onchainEven = null;
       let won = null;
-      let roll = null;
 
       try {
         for (const log of rc.logs) {
@@ -593,35 +727,49 @@
             if (parsed && parsed.name === "Played") {
               won = !!parsed.args.won;
               const diceResult = Number(parsed.args.diceResult); // 0 even / 1 odd
-              roll = Number(parsed.args.roll);
-              isEvenResult = diceResult === 0;
-              const outcomeTxt = isEvenResult ? "EVEN" : "ODD";
-              const winLossTxt = won ? "WIN" : "LOSE";
-              resultLine = `${outcomeTxt} • Roll: ${roll} • ${winLossTxt}`;
+              onchainEven = diceResult === 0;
               break;
             }
           } catch (_) {}
         }
       } catch (_) {}
 
-      // Final visual pattern based on on-chain outcome
-      if (isEvenResult === true) {
+      // If event not found, fallback (avoid breaking UI)
+      if (onchainEven === null) onchainEven = diceChoice === 0;
+      if (won === null) won = false;
+
+      // Fix #3: show correct pattern + random variants for that parity
+      if (onchainEven) {
         setCoinColors(randomEvenPattern());
-      } else if (isEvenResult === false) {
+      } else {
         setCoinColors(randomOddPattern());
       }
 
-      // final shake to feel "reveal"
-      shakeCoins();
+      // Payout display:
+      // If win, your dice contract pays 2x bet to the player (common pattern).
+      // We show "amount * 2" as payout when won, else 0.
+      const payoutBN = won ? amountBN.mul(2) : ethers.BigNumber.from(0);
+
+      renderDiceResultDetail({
+        onchainResultEven: onchainEven,
+        playerChoiceEven: diceChoice === 0,
+        won,
+        payoutBN,
+        hash: blockHash,
+      });
 
       setText("diceStatus", "Done ✓");
-      setText("diceResult", resultLine);
-
       await refreshAll();
     } catch (e) {
       console.error(e);
       setText("diceStatus", "Play failed.");
+      // Stop shake even if rejected
+      stopDiceShake();
       alert("Dice play failed or rejected.");
+      return;
+    } finally {
+      // Stop shake only after final outcome (or error)
+      stopDiceShake();
     }
   }
 
@@ -778,10 +926,13 @@
   }
 
   async function doLottoPlay() {
-    if (!lottoWrite || !account) {
+    // Fix #1 also applies to Lotto
+    const ok = await ensureReadyForTx();
+    if (!ok) {
       alert("Please connect wallet first.");
       return;
     }
+    if (!lottoWrite || !account) return;
 
     const bets = readBetsFromUI();
     if (!bets.ok) {
@@ -798,14 +949,14 @@
     setText("lottoBetSummary", (lottoBet27 ? "Bet27\n" : "BetOne\n") + sumLines.join("\n"));
 
     try {
-      setText("lottoStatus", "Sending transaction...");
+      setText("lottoStatus", "Waiting for wallet signature...");
       setText("lottoHash", "-");
       setText("lottoOutcome", "-");
       setText("lottoWinLoss", "-");
       setText("lottoResultsGrid", "-");
 
       const tx = await lottoWrite.play(lottoBet27, numbers, amounts);
-      setText("lottoStatus", "Waiting confirm...");
+      setText("lottoStatus", "Transaction sent. Waiting confirm...");
       const rc = await tx.wait();
 
       const blockHash = rc.blockHash || "-";
@@ -813,7 +964,6 @@
 
       // Parse Played event to get results + payout
       let results27 = null;
-      let totalBet = null;
       let totalPayout = null;
 
       try {
@@ -822,7 +972,6 @@
             const parsed = lottoRead.interface.parseLog(log);
             if (parsed && parsed.name === "Played") {
               results27 = parsed.args.results;
-              totalBet = parsed.args.totalBet;
               totalPayout = parsed.args.totalPayout;
               break;
             }
@@ -835,7 +984,9 @@
         for (let i = 0; i < 27; i++) arr.push(Number(results27[i]));
         render27Results(arr);
 
-        const betInfo = lottoBet27 ? "Bet27 applies to all 27 draws." : "BetOne applies only to draw #27.";
+        const betInfo = lottoBet27
+          ? "Bet27 applies to all 27 draws."
+          : "BetOne applies only to draw #27.";
         setText("lottoOutcome", betInfo);
       } else {
         setText("lottoResultsGrid", "Results not found in logs.");
@@ -843,17 +994,18 @@
       }
 
       // Win/Lose + payout
-      let payoutVin = null;
+      let payoutVin = 0;
       if (totalPayout) payoutVin = Number(ethers.utils.formatUnits(totalPayout, vinDecimals));
 
       const outcomeEl = $("lottoWinLoss");
-      if (outcomeEl) {
-        outcomeEl.classList.remove("win", "lose");
-      }
+      if (outcomeEl) outcomeEl.classList.remove("win", "lose");
 
-      const won = payoutVin && payoutVin > 0;
+      const won = payoutVin > 0;
       if (won) {
-        setText("lottoWinLoss", `WIN • Payout: ${payoutVin.toLocaleString(undefined, { maximumFractionDigits: 6 })} VIN`);
+        setText(
+          "lottoWinLoss",
+          `WIN • Payout: ${payoutVin.toLocaleString(undefined, { maximumFractionDigits: 6 })} VIN`
+        );
         if (outcomeEl) outcomeEl.classList.add("win");
       } else {
         setText("lottoWinLoss", "LOSE • Payout: 0 VIN");
@@ -909,8 +1061,8 @@
     $("diceDoubleBtn") && $("diceDoubleBtn").addEventListener("click", () => diceDouble());
     $("diceClearBtn") && $("diceClearBtn").addEventListener("click", () => diceClear());
 
-    // Default coin view (even pattern)
-    setCoinColors(["white", "white", "red", "red"]);
+    // Default coin view
+    setCoinColors(randomEvenPattern());
     setDiceChoice(0);
 
     // Lotto
@@ -925,11 +1077,11 @@
     $("lottoClearBtn") && $("lottoClearBtn").addEventListener("click", () => clearLotto());
     $("lottoPlayBtn") && $("lottoPlayBtn").addEventListener("click", () => doLottoPlay().catch(() => {}));
 
-    // Bind initial row sanitizers
+    // Bind initial row sanitizers (existing rows in HTML)
     const rows = getRowEls();
-    rows.forEach((r) => {
-      const num = r.querySelector(".lottoNumber");
-      const amt = r.querySelector(".lottoAmount");
+    rows.forEach((row) => {
+      const num = row.querySelector(".lottoNumber");
+      const amt = row.querySelector(".lottoAmount");
       if (num) num.addEventListener("input", () => (num.value = clamp2Digits(num.value)));
       if (num) num.addEventListener("blur", () => normalizeNumberInput(num));
       if (amt) amt.addEventListener("input", () => refreshLottoTotal().catch(() => {}));
@@ -939,31 +1091,25 @@
   }
 
   // -----------------------------
-  // Wallet events
+  // Ethereum events
   // -----------------------------
-  function bindWalletEvents() {
+  function bindEthereumEvents() {
     if (!window.ethereum) return;
 
     window.ethereum.on("accountsChanged", async (accs) => {
-      if (!accs || accs.length === 0) {
+      if (!accs || !accs.length) {
         disconnectUIOnly();
         return;
       }
-      account = accs[0];
-      provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-      signer = provider.getSigner();
-
-      setConnectButtonUI(true, account);
-      setText("walletShort", shortAddr(account));
-      setText("diceWalletShort", shortAddr(account));
-      setText("lottoWallet", shortAddr(account));
-
-      await initContracts();
-      await refreshAll();
+      // Re-init quickly
+      await ensureReadyForTx().catch(() => {});
+      await refreshAll().catch(() => {});
     });
 
-    window.ethereum.on("chainChanged", () => {
-      location.reload();
+    window.ethereum.on("chainChanged", async () => {
+      // Force re-init on chain switch
+      await ensureReadyForTx().catch(() => {});
+      await refreshAll().catch(() => {});
     });
   }
 
@@ -972,20 +1118,30 @@
   // -----------------------------
   function boot() {
     bindUI();
-    bindWalletEvents();
-
+    bindEthereumEvents();
     showScreen("home-screen");
-    setNetworkUI(false, "Not connected");
-    setConnectButtonUI(false, "");
 
-    // Read-only preload pools without wallet
-    try {
-      const ro = new ethers.providers.JsonRpcProvider(RPC_URL);
-      provider = ro;
-      initContracts()
-        .then(() => refreshPools())
-        .catch(() => {});
-    } catch (_) {}
+    // Try to show "connected" state if already authorized
+    (async () => {
+      if (!window.ethereum) return;
+      try {
+        const accs = await window.ethereum.request({ method: "eth_accounts" });
+        if (accs && accs.length) {
+          // Silent ensure (no popup)
+          provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+          signer = provider.getSigner();
+          account = accs[0];
+          setNetworkUI(true, "Monad");
+          setConnectButtonUI(true, account);
+          setText("walletShort", shortAddr(account));
+          setText("homeNetwork", "Monad");
+          setText("diceWalletShort", shortAddr(account));
+          setText("lottoWallet", shortAddr(account));
+          await initContracts();
+          await refreshAll();
+        }
+      } catch (_) {}
+    })();
   }
 
   if (document.readyState === "loading") {
