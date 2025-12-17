@@ -4,19 +4,16 @@
     <meta charset="UTF-8" />
     <title>VINMonad — Swap • Dice • Lotto</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b1220" />
     <meta
       name="description"
       content="On-chain utilities built on Monad, providing Swap, Dice, and Lotto through publicly verified contracts and an open-source dApp."
     />
-    <meta name="theme-color" content="#0b1220" />
 
     <link rel="icon" type="image/png" href="logo.png" />
     <link rel="stylesheet" href="style.css" />
 
-    <!-- Ethers v5 -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-
-    <!-- App logic -->
     <script src="app.js" defer></script>
   </head>
 
@@ -153,15 +150,6 @@
                 </div>
               </div>
 
-              <div class="meta">
-                <div class="meta-row">
-                  <span class="muted" id="swapRateLabel">Rate: 1 VIN = 100 MON (fixed while pool has liquidity)</span>
-                </div>
-                <div class="meta-row">
-                  <span class="muted" id="swapPoolLabel">Pool: -</span>
-                </div>
-              </div>
-
               <div class="actions-row">
                 <button class="btn btn-outline" id="swapApproveBtn" type="button">Approve (1,000,000 VIN)</button>
                 <button class="btn btn-primary" id="swapBtn" type="button">Swap</button>
@@ -224,15 +212,31 @@
                     <span>Bet Amount (VIN)</span>
                     <span class="muted" id="diceMinMax">Min 1 / Max 50</span>
                   </div>
+
                   <div class="input-row">
                     <input id="diceBetAmt" type="text" inputmode="decimal" placeholder="1" value="1" />
                     <button class="btn-mini" id="diceMaxBtn" type="button">MAX</button>
                   </div>
+
+                  <div class="quick-row">
+                    <button class="btn-mini" id="diceHalfBtn" type="button">1/2</button>
+                    <button class="btn-mini" id="diceDoubleBtn" type="button">x2</button>
+                    <button class="btn-mini" id="diceClearBtn" type="button">Clear</button>
+                  </div>
                 </div>
 
                 <div class="choice-row">
-                  <button class="chip chip-choice active" id="diceEvenBtn" type="button">EVEN</button>
-                  <button class="chip chip-choice" id="diceOddBtn" type="button">ODD</button>
+                  <button class="chip chip-choice active" id="diceEvenBtn" type="button" aria-pressed="true">EVEN</button>
+                  <button class="chip chip-choice" id="diceOddBtn" type="button" aria-pressed="false">ODD</button>
+                </div>
+
+                <div class="dice-bowl">
+                  <div class="dice-coins" id="diceCoins">
+                    <div class="coin coin-white" id="coin0"></div>
+                    <div class="coin coin-white" id="coin1"></div>
+                    <div class="coin coin-white" id="coin2"></div>
+                    <div class="coin coin-white" id="coin3"></div>
+                  </div>
                 </div>
 
                 <div class="actions-row">
@@ -244,6 +248,7 @@
                 <div class="panel-sub">
                   <div class="panel-sub-title">Result</div>
                   <div class="muted" id="diceResult">-</div>
+                  <div class="muted" id="diceHash">-</div>
                 </div>
               </div>
             </div>
@@ -290,8 +295,12 @@
               <div class="panel-title">Place Bet</div>
 
               <div class="tabs">
-                <button class="tab active" id="lottoTabBetOne" type="button">BetOne (x70)</button>
-                <button class="tab" id="lottoTabBet27" type="button">Bet27 (x3 per hit)</button>
+                <button class="tab active" id="lottoTabBetOne" type="button">BetOne (only draw #27)</button>
+                <button class="tab" id="lottoTabBet27" type="button">Bet27 (all 27 draws)</button>
+              </div>
+
+              <div class="hint">
+                27 independent draws with replacement. Bet27 applies to all 27 draws; BetOne only applies to draw #27.
               </div>
 
               <div class="form">
@@ -339,13 +348,15 @@
                 </div>
 
                 <div class="panel-sub">
-                  <div class="panel-sub-title">Result</div>
-                  <div class="muted" id="lottoResultSummary">No result yet</div>
+                  <div class="panel-sub-title">Draw Results (27)</div>
+                  <div class="muted" id="lottoHash">-</div>
+                  <div class="lotto-results" id="lottoResultsGrid">-</div>
                 </div>
 
                 <div class="panel-sub">
-                  <div class="panel-sub-title">Win / Loss</div>
-                  <div class="muted" id="lottoWinLoss">No win/loss yet</div>
+                  <div class="panel-sub-title">Outcome</div>
+                  <div class="muted" id="lottoOutcome">-</div>
+                  <div class="muted" id="lottoWinLoss">-</div>
                 </div>
               </div>
             </div>
@@ -354,18 +365,13 @@
       </main>
 
       <!-- FOOTER -->
-      <footer class="footer">
-        <div class="footer-left">
-          <span class="muted">VINMonad • Monad (chainId 143)</span>
-        </div>
-
-        <div class="footer-right">
-          <a class="footer-link" href="https://t.me/vinmonad" target="_blank" rel="noreferrer">Telegram</a>
-          <a class="footer-link" href="https://x.com/vinmonad" target="_blank" rel="noreferrer">X</a>
-          <a class="footer-link" href="https://github.com/vinmonad" target="_blank" rel="noreferrer">GitHub</a>
-
-          <span class="footer-sep">•</span>
-          <a class="footer-link" href="https://monadvision.com" target="_blank" rel="noreferrer">Explorer</a>
+      <footer class="footer footer-compact">
+        <div class="footer-links">
+          <a class="footer-pill" href="https://monadvision.com/token/0x038A2f1abe221d403834aa775669169Ef5eb120A" target="_blank" rel="noreferrer">VIN Token</a>
+          <a class="footer-pill" href="https://monadvision.com/address/0x73a8C8Bf994A53DaBb9aE707cD7555DFD1909fbB" target="_blank" rel="noreferrer">VINSwap</a>
+          <a class="footer-pill" href="https://monadvision.com/address/0xf2b1C0A522211949Ad2671b0F4bF92547d66ef3A" target="_blank" rel="noreferrer">VINDice</a>
+          <a class="footer-pill" href="https://monadvision.com/address/0x17e945Bc2AeB9fcF9eb73DC4e4b8E2AE2962B525" target="_blank" rel="noreferrer">VINLotto</a>
+          <a class="footer-pill" href="https://ipfs.io/ipfs/bafybeigh2cnllrenu3gbtn6qk2ctlqs54ibwqwewa4s56squkzpguhcsve" target="_blank" rel="noreferrer">IPFS</a>
         </div>
       </footer>
     </div>
