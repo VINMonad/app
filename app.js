@@ -516,7 +516,7 @@ function parseMonInput(str) {
 
     const [minBet, maxBet] = await Promise.all([
       diceRead.MIN_BET(),
-      diceRead.getMaxBet()
+      diceRead.maxBetAllowed()
     ]);
 
     // Store min/max bet to use in other calculations
