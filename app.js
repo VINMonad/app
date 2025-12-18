@@ -175,27 +175,39 @@
 ];
 
 
-  // ===== Global State =====
-  let rpcProvider = null;
-  let web3Provider = null;
-  let signer = null;
-  let currentAccount = null;
+// ===== Global State =====
+let rpcProvider = null;
+let web3Provider = null;
+let signer = null;
+let currentAccount = null;
 
-  let vinRead = null;
-  let vinWrite = null;
-  let swapRead = null;
-  let swapWrite = null;
-  let diceRead = null;
-  let diceWrite = null;
+let vinRead = null;
+let vinWrite = null;
+let swapRead = null;
+let swapWrite = null;
+let diceRead = null;
+let diceWrite = null;
 
-  let lastDiceBetBN = null;
-  let diceGuessEven = true; // true = EVEN, false = ODD
-  let diceMinBetBN = null;
-  let diceMaxBetBN = null;
-  let diceAllowanceBN = null;
-  let lastDiceGame = null;
+// ===== Dice State =====
+let lastDiceBetBN = null;
+let diceGuessEven = true; // true = EVEN, false = ODD
+let diceMinBetBN = null;
+let diceMaxBetBN = null;
+let diceAllowanceBN = null;
+let lastDiceGame = null;
 
-  let swapDirection = "vinToMon"; // "vinToMon" or "monToVin"
+// ===== Lotto State =====
+let lottoRead = null;
+let lottoWrite = null;
+
+let lottoBet27 = false; // false = BetOne, true = Bet27
+
+let lottoRows = [
+  { number: 0, amount: "1" }
+];
+
+// ===== Swap State =====
+let swapDirection = "vinToMon"; // "vinToMon" or "monToVin"
 
   // ===== Helpers =====
   function $(id) {
