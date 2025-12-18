@@ -410,19 +410,30 @@ function parseMonInput(str) {
   }
 
   function initNav() {
-    const navHome = $("navHome");
-    const navSwap = $("navSwap");
-    const navDice = $("navDice");
-    const goToSwap = $("goToSwap");
-    const goToDice = $("goToDice");
+  const navHome = $("navHome");
+  const navSwap = $("navSwap");
+  const navDice = $("navDice");
+  const navLotto = $("navLotto");  
+  const goToSwap = $("goToSwap");
+  const goToDice = $("goToDice");
+  const goToLotto = $("goToLotto"); 
 
-    if (navHome) navHome.addEventListener("click", () => showScreen("home-screen"));
-    if (navSwap) navSwap.addEventListener("click", () => showScreen("swap-screen"));
-    if (navDice) navDice.addEventListener("click", () => showScreen("dice-screen"));
+  if (navHome) navHome.addEventListener("click", () => showScreen("home-screen"));
+  if (navSwap) navSwap.addEventListener("click", () => showScreen("swap-screen"));
+  if (navDice) navDice.addEventListener("click", () => showScreen("dice-screen"));
+  if (navLotto) navLotto.addEventListener("click", () => {
+    showScreen("lotto-screen");
+    setActiveNav("navLotto");
+  }); // Thêm event cho navLotto
 
-    if (goToSwap) goToSwap.addEventListener("click", () => showScreen("swap-screen"));
-    if (goToDice) goToDice.addEventListener("click", () => showScreen("dice-screen"));
-  }
+  if (goToSwap) goToSwap.addEventListener("click", () => showScreen("swap-screen"));
+  if (goToDice) goToDice.addEventListener("click", () => showScreen("dice-screen"));
+  if (goToLotto) goToLotto.addEventListener("click", () => {
+    showScreen("lotto-screen");
+    setActiveNav("navLotto");
+  });
+}
+
 
   // ===== Balances & Pool =====
   async function refreshBalances() {
