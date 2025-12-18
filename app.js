@@ -92,98 +92,15 @@ const SWAP_ABI = [
 ];
   
 const LOTTO_ABI = [
-  {
-    inputs: [],
-    name: "MIN_BET",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function"
-  },
-  {
-    inputs: [],
-    name: "RESULTS_COUNT",
-    outputs: [{ internalType: "uint8", name: "", type: "uint8" }],
-    stateMutability: "view",
-    type: "function"
-  },
-  {
-    inputs: [],
-    name: "VIN",
-    outputs: [{ internalType: "contract IERC20", name: "", type: "address" }],
-    stateMutability: "view",
-    type: "function"
-  },
-  {
-    inputs: [
-      {
-        components: [
-          { internalType: "uint8", name: "number", type: "uint8" },
-          { internalType: "uint256", name: "amount", type: "uint256" },
-          { internalType: "uint8", name: "betType", type: "uint8" }
-        ],
-        internalType: "struct VINLottoV5.Bet[]",
-        name: "bets",
-        type: "tuple[]"
-      }
-    ],
-    name: "maxPossiblePayout",
-    outputs: [{ internalType: "uint256", name: "maxPayout", type: "uint256" }],
-    stateMutability: "pure",
-    type: "function"
-  },
-  {
-    inputs: [],
-    name: "nonce",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function"
-  },
-  {
-    inputs: [],
-    name: "owner",
-    outputs: [{ internalType: "address", name: "", type: "address" }],
-    stateMutability: "view",
-    type: "function"
-  },
-  {
-    inputs: [
-      {
-        components: [
-          { internalType: "uint8", name: "number", type: "uint8" },
-          { internalType: "uint256", name: "amount", type: "uint256" },
-          { internalType: "uint8", name: "betType", type: "uint8" }
-        ],
-        internalType: "struct VINLottoV5.Bet[]",
-        name: "bets",
-        type: "tuple[]"
-      }
-    ],
-    name: "play",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function"
-  },
-  {
-    inputs: [],
-    name: "renounceOwnership",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function"
-  },
-  {
-    inputs: [{ internalType: "address", name: "newOwner", type: "address" }],
-    name: "transferOwnership",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function"
-  },
-  {
-    inputs: [{ internalType: "uint256", name: "amount", type: "uint256" }],
-    name: "withdraw",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function"
-  }
+  // ===== Views =====
+  "function MIN_BET() view returns (uint256)",
+  "function RESULTS_COUNT() view returns (uint8)",
+
+  // Optional safety check (UI-level)
+  "function maxPossiblePayout((uint8 number,uint256 amount,uint8 betType)[] bets) pure returns (uint256)",
+
+  // ===== Core play =====
+  "function play((uint8 number,uint256 amount,uint8 betType)[] bets)"
 ];
 
   // ===== Global State =====
