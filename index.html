@@ -443,60 +443,80 @@ document.addEventListener('DOMContentLoaded', function () {
       </section>
       <!-- LOTTO SCREEN -->
 <section class="screen" id="lotto-screen">
-
   <div class="screen-header">
     <h1>Lotto (VIN)</h1>
     <p class="screen-subtitle">
-      Choose numbers from 00–99. Instant on-chain result.
+      Choose numbers from 00–99. Each play is independent and settled on-chain.
     </p>
   </div>
 
   <div class="lotto-layout">
 
     <!-- LEFT: WALLET & POOL -->
-    <div class="lotto-card">
-      <h2>Your Wallet</h2>
+    <div class="lotto-card lotto-card-left">
+      <div class="lotto-section">
+        <h2>Your Wallet</h2>
 
-      <div class="status-row">
-        <span class="status-label">Wallet:</span>
-        <span class="status-value" id="lottoWallet">-</span>
-      </div>
+        <div class="status-row">
+          <span class="status-label">Wallet:</span>
+          <span class="status-value" id="lottoWalletAddress">
+            Not connected
+          </span>
+        </div>
 
-      <div class="status-row">
-        <span class="status-label">VIN Balance:</span>
-        <span class="status-value" id="lottoVinBalance">-</span>
-      </div>
-
-      <div class="status-row">
-        <span class="status-label">Lotto Pool:</span>
-        <span class="status-value" id="lottoPool">Loading...</span>
+        <div class="status-row">
+          <span class="status-label">VIN Balance:</span>
+          <span class="status-value" id="lottoVinBalance">
+            -
+          </span>
+        </div>
       </div>
 
       <div class="lotto-section">
-        <h3>Approval</h3>
+        <h2>Reward Pool (VIN)</h2>
+        <div class="status-row">
+          <span class="status-label">Pool:</span>
+          <span class="status-value" id="lottoPoolVin">
+            Loading...
+          </span>
+        </div>
+      </div>
+
+      <div class="lotto-section">
+        <h2>Approval</h2>
         <p class="lotto-note">
-          Approve VIN once to play Lotto.
+          Approve VIN once to play Lotto. You do not need to approve every time.
         </p>
-        <button class="btn btn-primary btn-full" id="lottoApproveBtn">
+        <button class="btn btn-primary btn-full" id="lottoApproveButton">
           Approve VIN for Lotto
         </button>
       </div>
     </div>
 
     <!-- RIGHT: PLAY -->
-    <div class="lotto-card">
+    <div class="lotto-card lotto-card-right">
 
       <!-- Bet type -->
       <div class="lotto-section">
         <h2>Bet Type</h2>
         <div class="lotto-radio-group">
           <label>
-            <input type="radio" name="lottoType" value="betone" checked />
-            BetOne (70×)
+            <input
+              type="radio"
+              name="lottoType"
+              value="betone"
+              checked
+            />
+            BetOne (00–99)
           </label>
+
           <label>
-            <input type="radio" name="lottoType" value="bet27" />
-            Bet27 (4× per hit)
+            <input
+              type="radio"
+              name="lottoType"
+              value="bet27"
+            />
+            Bet27 (27 numbers)
           </label>
         </div>
       </div>
@@ -508,10 +528,34 @@ document.addEventListener('DOMContentLoaded', function () {
         <div id="lottoRows">
           <!-- DEFAULT ROW -->
           <div class="lotto-row">
-            <input type="number" min="0" max="99" placeholder="00–99" class="lotto-number" />
-            <input type="number" min="1" step="1" value="1" class="lotto-amount" />
-            <button class="btn-icon lotto-add">＋</button>
-            <button class="btn-icon lotto-remove">－</button>
+            <input
+              type="number"
+              min="0"
+              max="99"
+              placeholder="00–99"
+              class="lotto-number"
+            />
+            <input
+              type="number"
+              min="1"
+              step="1"
+              value="1"
+              class="lotto-amount"
+            />
+            <button
+              type="button"
+              class="btn-icon lotto-add"
+              title="Add row"
+            >
+              +
+            </button>
+            <button
+              type="button"
+              class="btn-icon lotto-remove"
+              title="Remove row"
+            >
+              −
+            </button>
           </div>
         </div>
       </div>
@@ -520,22 +564,34 @@ document.addEventListener('DOMContentLoaded', function () {
       <div class="lotto-section">
         <div class="status-row">
           <span class="status-label">Total Bet:</span>
-          <span class="status-value" id="lottoTotal">0 VIN</span>
+          <span class="status-value" id="lottoTotal">
+            0 VIN
+          </span>
         </div>
       </div>
 
       <!-- Tools -->
       <div class="lotto-section">
         <div class="lotto-tools">
-          <button class="btn-tool" id="lottoHalf">½</button>
-          <button class="btn-tool" id="lottoDouble">×2</button>
-          <button class="btn-tool" id="lottoClear">Clear</button>
+          <button type="button" class="btn-tool" id="lottoHalf">
+            ½
+          </button>
+          <button type="button" class="btn-tool" id="lottoDouble">
+            ×2
+          </button>
+          <button type="button" class="btn-tool" id="lottoClear">
+            Clear
+          </button>
         </div>
       </div>
 
       <!-- Play -->
       <div class="lotto-section">
-        <button class="btn btn-primary btn-full" id="lottoPlayBtn">
+        <button
+          type="button"
+          class="btn btn-primary btn-full"
+          id="lottoPlayButton"
+        >
           Play Lotto
         </button>
       </div>
@@ -544,9 +600,9 @@ document.addEventListener('DOMContentLoaded', function () {
       <div class="lotto-section">
         <h2>Result</h2>
         <div class="lotto-result" id="lottoResult">
-          Waiting for play…
+          Waiting for your play...
         </div>
-        <div class="lotto-hash" id="lottoTxHash"></div>
+        <div class="lotto-tx-hash" id="lottoTxHash"></div>
       </div>
 
       <!-- Decode -->
@@ -554,11 +610,15 @@ document.addEventListener('DOMContentLoaded', function () {
         <h2>Decode Result</h2>
         <input
           type="text"
-          placeholder="Paste transaction hash"
-          id="lottoDecodeInput"
           class="lotto-input"
+          id="lottoDecodeInput"
+          placeholder="Paste transaction hash"
         />
-        <button class="btn btn-secondary btn-full" id="lottoDecodeBtn">
+        <button
+          type="button"
+          class="btn btn-secondary btn-full"
+          id="lottoDecodeButton"
+        >
           Decode
         </button>
       </div>
