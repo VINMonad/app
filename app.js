@@ -385,7 +385,7 @@ function parseMonInput(str) {
 
   // ===== Screens / Navigation =====
   function showScreen(screenId) {
-    const screens = ["home-screen", "swap-screen", "dice-screen"];
+    const screens = ["home-screen", "swap-screen", "dice-screen", "lotto-screen"];
     screens.forEach((id) => {
       const el = $(id);
       if (!el) return;
