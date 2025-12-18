@@ -648,7 +648,7 @@ function parseMonInput(str) {
         }
 
         statusEl.textContent = "Sending MON→VIN swap transaction...";
-        const gasEstimate = await swapWrite.estimateGas.swapMonForVin({
+        const gasEstimate = await swapWrite.estimateGas.swapMONtoVIN({
           value: amountBN
         });
         const gasLimit = gasEstimate.mul(120).div(100);
