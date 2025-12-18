@@ -74,38 +74,12 @@
     }
   ];
 
-  // Swap MON <-> VIN (1:1)
+  // Swap VIN <-> MON (1:100)
   const SWAP_ABI = [
-    {
-      inputs: [],
-      name: "getMonReserve",
-      outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-      stateMutability: "view",
-      type: "function"
-    },
-    {
-      inputs: [],
-      name: "getVinReserve",
-      outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-      stateMutability: "view",
-      type: "function"
-    },
-    {
-      inputs: [],
-      name: "swapMonForVin",
-      outputs: [],
-      stateMutability: "payable",
-      type: "function"
-    },
-    {
-      inputs: [{ internalType: "uint256", name: "vinAmount", type: "uint256" }],
-      name: "swapVinForMon",
-      outputs: [],
-      stateMutability: "nonpayable",
-      type: "function"
-    }
-  ];
-
+  "function RATE() view returns (uint256)",
+  "function swapVINtoMON(uint256 vinAmount)",
+  "function swapMONtoVIN() payable"
+];
   // Dice V2
   // Choice: EVEN = 0, ODD = 1
   const DICE_ABI = [
