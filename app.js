@@ -109,83 +109,13 @@
   // Dice V2
   // Choice: EVEN = 0, ODD = 1
   const DICE_ABI = [
-    {
-      inputs: [],
-      name: "MIN_BET",
-      outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-      stateMutability: "view",
-      type: "function"
-    },
-    {
-      inputs: [],
-      name: "VIN_TOKEN",
-      outputs: [{ internalType: "address", name: "", type: "address" }],
-      stateMutability: "view",
-      type: "function"
-    },
-    {
-      inputs: [],
-      name: "getBankBalance",
-      outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-      stateMutability: "view",
-      type: "function"
-    },
-    {
-      inputs: [],
-      name: "getMaxBet",
-      outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-      stateMutability: "view",
-      type: "function"
-    },
-    {
-      inputs: [
-        { internalType: "uint256", name: "amount", type: "uint256" },
-        { internalType: "uint8", name: "choice", type: "uint8" },
-        { internalType: "uint256", name: "clientSeed", type: "uint256" }
-      ],
-      name: "play",
-      outputs: [],
-      stateMutability: "nonpayable",
-      type: "function"
-    },
-    {
-      anonymous: false,
-      inputs: [
-        {
-          indexed: true,
-          internalType: "address",
-          name: "player",
-          type: "address"
-        },
-        {
-          indexed: false,
-          internalType: "uint256",
-          name: "amount",
-          type: "uint256"
-        },
-        {
-          indexed: false,
-          internalType: "uint8",
-          name: "choice",
-          type: "uint8"
-        },
-        {
-          indexed: false,
-          internalType: "uint8",
-          name: "result",
-          type: "uint8"
-        },
-        {
-          indexed: false,
-          internalType: "bool",
-          name: "won",
-          type: "bool"
-        }
-      ],
-      name: "Played",
-      type: "event"
-    }
-  ];
+  "function MIN_BET() view returns (uint256)",
+  "function MAX_BET() view returns (uint256)",
+  "function bankBalance() view returns (uint256)",
+  "function maxBetAllowed() view returns (uint256)",
+  "function play(uint256 amount, uint8 choice, uint256 clientSeed)",
+  "event Played(address indexed player,uint256 amount,uint8 choice,uint8 result,bool won)"
+];
 
   // ===== Global State =====
   let rpcProvider = null;
