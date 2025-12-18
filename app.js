@@ -472,7 +472,7 @@ function parseMonInput(str) {
       const [vinBal, monBal, bankBal] = await Promise.all([
         vinRead.balanceOf(currentAccount),
         rpcProvider.getBalance(currentAccount),
-        diceRead.getBankBalance()
+        diceRead.bankBalance()
       ]);
 
       const addrShort = shortenAddress(currentAccount);
