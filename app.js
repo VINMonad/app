@@ -625,7 +625,7 @@ function parseMonInput(str) {
         const gasEstimate = await swapWrite.estimateGas.swapVinForMon(amountBN);
         const gasLimit = gasEstimate.mul(120).div(100);
 
-        const tx = await swapWrite.swapVinForMon(amountBN, { gasLimit });
+        const tx = await swapWrite.swapVINtoMON(amountBN, { gasLimit });
         const receipt = await tx.wait();
         if (receipt.status !== 1) {
           statusEl.textContent = "Swap transaction reverted.";
