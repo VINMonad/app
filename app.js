@@ -295,50 +295,43 @@ function parseMonInput(str) {
 
   // ===== Providers & Contracts =====
   function initReadProvider() {
-    if (!rpcProvider) {
-      rpcProvider = new ethers.providers.JsonRpcProvider(RPC_URL, {
-        name: "monad",
-        chainId: MONAD_CHAIN_ID_DEC
-      });
-    }
-    if (!vinRead) {
-      vinRead = new ethers.Contract(VIN_TOKEN_ADDRESS, VIN_ABI, rpcProvider);
-    }
-    if (!swapRead) {
-      swapRead = new ethers.Contract(
-        SWAP_CONTRACT_ADDRESS,
-        SWAP_ABI,
-        rpcProvider
-      );
-    }
-    if (!diceRead) {
-      diceRead = new ethers.Contract(
-        DICE_CONTRACT_ADDRESS,
-        DICE_ABI,
-        rpcProvider
-      );
-    }
+  if (!rpcProvider) {
+    rpcProvider = new ethers.providers.JsonRpcProvider(RPC_URL, {
+      name: "monad",
+      chainId: MONAD_CHAIN_ID_DEC
+    });
   }
-    if (!lottoRead) {
-      lottoRead = new ethers.Contract(
-        LOTTO_CONTRACT_ADDRESS,
-        LOTTO_ABI,
-        rpcProvider
-      );
-    }
 
+  if (!vinRead) {
+    vinRead = new ethers.Contract(VIN_TOKEN_ADDRESS, VIN_ABI, rpcProvider);
+  }
+  if (!swapRead) {
+    swapRead = new ethers.Contract(SWAP_CONTRACT_ADDRESS, SWAP_ABI, rpcProvider);
+  }
+  if (!diceRead) {
+    diceRead = new ethers.Contract(DICE_CONTRACT_ADDRESS, DICE_ABI, rpcProvider);
+  }
+  if (!lottoRead) {
+    lottoRead = new ethers.Contract(
+      LOTTO_CONTRACT_ADDRESS,
+      LOTTO_ABI,
+      rpcProvider
+    );
+  }
+}
 
   function initWriteContracts() {
-    if (!web3Provider || !signer) return;
-    vinWrite = new ethers.Contract(VIN_TOKEN_ADDRESS, VIN_ABI, signer);
-    swapWrite = new ethers.Contract(SWAP_CONTRACT_ADDRESS, SWAP_ABI, signer);
-    diceWrite = new ethers.Contract(DICE_CONTRACT_ADDRESS, DICE_ABI, signer);
-  }
-    lottoWrite = new ethers.Contract(
+  if (!web3Provider || !signer) return;
+
+  vinWrite = new ethers.Contract(VIN_TOKEN_ADDRESS, VIN_ABI, signer);
+  swapWrite = new ethers.Contract(SWAP_CONTRACT_ADDRESS, SWAP_ABI, signer);
+  diceWrite = new ethers.Contract(DICE_CONTRACT_ADDRESS, DICE_ABI, signer);
+  lottoWrite = new ethers.Contract(
     LOTTO_CONTRACT_ADDRESS,
     LOTTO_ABI,
     signer
   );
+}
 
 
   // ===== Network =====
