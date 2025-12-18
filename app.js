@@ -1265,11 +1265,155 @@ function initWriteContracts() {
     onGuessButtonClick(true);
   }
   
-  // ===== Lotto: basic init =====
+  // ====================================================================
+// =========================== LOTTO =================================
+// ====================================================================
+
+// ---------- INIT ----------
 function initLottoUI() {
+  lottoBet27 = false;
+  lottoRows = [{ number: 0, amount: "1" }];
   renderLottoRows();
+  updateLottoTotal();
 }
 
+// ---------- RENDER ROWS ----------
+function renderLottoRows() {
+  const box = $("lottoRows");
+  if (!box) return;
+
+  box.innerHTML = "";
+
+  lottoRows.forEach((row, i) => {
+    const div = document.createElement("div");
+    div.className = "lotto-row";
+    div.innerHTML = `
+      <input type="number" min="0" max="99"
+        value="${row.number}"
+        class="lotto-number"
+        data-i="${i}"
+      />
+      <input type="number" min="1"
+        value="${row.amount}"
+        class="lotto-amount"
+        data-i="${i}"
+      />
+      <button class="lotto-add" data-i="${i}">+</button>
+      <button class="lotto-remove" data-i="${i}">−</button>
+    `;
+    box.appendChild(div);
+  });
+}
+
+// ---------- TOTAL ----------
+function updateLottoTotal() {
+  let total = 0;
+  lottoRows.forEach(r => {
+    const v = Number(r.amount);
+    if (!isNaN(v) && v > 0) total += v;
+  });
+  setText("lottoTotal", total.toString());
+}
+
+// ---------- INPUT EVENTS ----------
+document.addEventListener("input", e => {
+  if (e.target.classList.contains("lotto-number")) {
+    const i = +e.target.dataset.i;
+    lottoRows[i].number = Math.max(0, Math.min(99, Number(e.target.value)));
+  }
+
+  if (e.target.classList.contains("lotto-amount")) {
+    const i = +e.target.dataset.i;
+    lottoRows[i].amount = e.target.value;
+    updateLottoTotal();
+  }
+});
+
+// ---------- BUTTON EVENTS ----------
+document.addEventListener("click", e => {
+  if (e.target.classList.contains("lotto-add")) {
+    lottoRows.push({ number: 0, amount: "1" });
+    renderLottoRows();
+    updateLottoTotal();
+  }
+
+  if (e.target.classList.contains("lotto-remove")) {
+    if (lottoRows.length > 1) {
+      lottoRows.splice(+e.target.dataset.i, 1);
+      renderLottoRows();
+      updateLottoTotal();
+    }
+  }
+});
+
+// ---------- TOOLS ----------
+function lottoHalf() {
+  lottoRows.forEach(r => r.amount = Math.max(1, Number(r.amount) / 2).toString());
+  renderLottoRows();
+  updateLottoTotal();
+}
+
+function lottoDouble() {
+  lottoRows.forEach(r => r.amount = (Number(r.amount) * 2).toString());
+  renderLottoRows();
+  updateLottoTotal();
+}
+
+function lottoClear() {
+  lottoRows = [{ number: 0, amount: "1" }];
+  renderLottoRows();
+  updateLottoTotal();
+}
+
+// ---------- BET TYPE ----------
+function setLottoBet(is27) {
+  lottoBet27 = is27;
+  $("lottoBetOne")?.classList.toggle("active", !is27);
+  $("lottoBet27")?.classList.toggle("active", is27);
+}
+
+// ---------- PLAY ----------
+async function playLotto() {
+  if (!lottoWrite || !currentAccount) return;
+
+  const numbers = [];
+  const amounts = [];
+
+  lottoRows.forEach(r => {
+    numbers.push(r.number);
+    amounts.push(ethers.utils.parseEther(r.amount.toString()));
+  });
+
+  try {
+    setText("lottoStatus", "Waiting for confirmation...");
+    const tx = await lottoWrite.play(lottoBet27, numbers, amounts);
+    const receipt = await tx.wait();
+
+    const ev = receipt.events.find(e => e.event === "Played");
+    if (!ev) return;
+
+    const payout = ev.args.totalPayout;
+    if (payout.gt(0)) {
+      setText("lottoStatus", "🎉 YOU WIN!");
+    } else {
+      setText("lottoStatus", "❌ NO WIN");
+    }
+
+    setText("lottoHash", receipt.transactionHash);
+  } catch (e) {
+    setText("lottoStatus", "❌ TX FAILED");
+  }
+}
+
+// ---------- BIND ----------
+function bindLottoButtons() {
+  $("lottoBetOne").onclick = () => setLottoBet(false);
+  $("lottoBet27").onclick = () => setLottoBet(true);
+  $("lottoHalf").onclick = lottoHalf;
+  $("lottoDouble").onclick = lottoDouble;
+  $("lottoClear").onclick = lottoClear;
+  $("lottoPlay").onclick = playLotto;
+}
 
   // ===== Wallet =====
   async function connectWallet() {
