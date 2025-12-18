@@ -3,7 +3,7 @@
 // VINTokenV2: 0x038A2f1abe221d403834aa775669169Ef5eb120A
 // Swap V2:    0x73a8C8Bf994A53DaBb9aE707cD7555DFD1909fbB
 // Dice V2:    0xB8D7D799eE31FedD38e63801419782E8110326E4
-// LottoV1:    0x59348366C6724EbBB16d429A2af57cC0b2E34A75
+// LottoV1:    0x85993C463f2b4a8656871891b463AeA79734ab27
 
 (() => {
   "use strict";
@@ -16,7 +16,7 @@
   const VIN_TOKEN_ADDRESS = "0x038A2f1abe221d403834aa775669169Ef5eb120A";
   const SWAP_CONTRACT_ADDRESS = "0x73a8C8Bf994A53DaBb9aE707cD7555DFD1909fbB";
   const DICE_CONTRACT_ADDRESS = "0xB8D7D799eE31FedD38e63801419782E8110326E4";
-  const LOTTO_CONTRACT_ADDRESS = "0x59348366C6724EbBB16d429A2af57cC0b2E34A75";
+  const LOTTO_CONTRACT_ADDRESS = "0x85993C463f2b4a8656871891b463AeA79734ab27";
 
 
   const MON_DECIMALS = 18; // native MON uses 18 decimals
@@ -92,31 +92,16 @@
   "function play(uint256 amount, uint8 choice, uint256 clientSeed)",
   "event Played(address indexed player,uint256 amount,uint8 choice,uint8 result,bool won)"
 ];
+
   const LOTTO_ABI = [
-  // constructor
+  // ===== READ =====
   {
     "inputs": [],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
+    "name": "VIN",
+    "outputs": [{ "internalType": "contract IERC20", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
   },
-
-  // event Played
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true,  "internalType": "address",   "name": "player",      "type": "address" },
-      { "indexed": false, "internalType": "bool",      "name": "bet27",       "type": "bool" },
-      { "indexed": false, "internalType": "uint8[]",   "name": "numbers",     "type": "uint8[]" },
-      { "indexed": false, "internalType": "uint256[]", "name": "amounts",     "type": "uint256[]" },
-      { "indexed": false, "internalType": "uint8[27]", "name": "results",     "type": "uint8[27]" },
-      { "indexed": false, "internalType": "uint256",   "name": "totalBet",    "type": "uint256" },
-      { "indexed": false, "internalType": "uint256",   "name": "totalPayout", "type": "uint256" }
-    ],
-    "name": "Played",
-    "type": "event"
-  },
-
-  // view
   {
     "inputs": [],
     "name": "MIN_BET",
@@ -133,18 +118,25 @@
   },
   {
     "inputs": [],
-    "name": "VIN",
-    "outputs": [{ "internalType": "contract IERC20", "name": "", "type": "address" }],
+    "name": "nonce",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
 
-  // play
+  // ===== CORE PLAY =====
   {
     "inputs": [
-      { "internalType": "bool",      "name": "bet27",   "type": "bool" },
-      { "internalType": "uint8[]",   "name": "numbers", "type": "uint8[]" },
-      { "internalType": "uint256[]", "name": "amounts", "type": "uint256[]" }
+      {
+        "components": [
+          { "internalType": "uint8", "name": "number", "type": "uint8" },
+          { "internalType": "uint256", "name": "amount", "type": "uint256" },
+          { "internalType": "uint8", "name": "betType", "type": "uint8" }
+        ],
+        "internalType": "struct VINLottoV5.Bet[]",
+        "name": "bets",
+        "type": "tuple[]"
+      }
     ],
     "name": "play",
     "outputs": [],
@@ -152,25 +144,48 @@
     "type": "function"
   },
 
-  // maxPossiblePayout
+  // ===== POOL SAFETY (OPTIONAL READ) =====
   {
     "inputs": [
-      { "internalType": "bool",        "name": "bet27",  "type": "bool" },
-      { "internalType": "uint256[]",   "name": "amounts","type": "uint256[]" }
+      {
+        "components": [
+          { "internalType": "uint8", "name": "number", "type": "uint8" },
+          { "internalType": "uint256", "name": "amount", "type": "uint256" },
+          { "internalType": "uint8", "name": "betType", "type": "uint8" }
+        ],
+        "internalType": "struct VINLottoV5.Bet[]",
+        "name": "bets",
+        "type": "tuple[]"
+      }
     ],
     "name": "maxPossiblePayout",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "outputs": [{ "internalType": "uint256", "name": "maxPayout", "type": "uint256" }],
     "stateMutability": "pure",
     "type": "function"
   },
 
-  // withdraw
+  // ===== EVENT =====
   {
-    "inputs": [{ "internalType": "uint256", "name": "amount", "type": "uint256" }],
-    "name": "withdraw",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "address", "name": "player", "type": "address" },
+      {
+        "indexed": false,
+        "internalType": "struct VINLottoV5.Bet[]",
+        "name": "bets",
+        "type": "tuple[]",
+        "components": [
+          { "internalType": "uint8", "name": "number", "type": "uint8" },
+          { "internalType": "uint256", "name": "amount", "type": "uint256" },
+          { "internalType": "uint8", "name": "betType", "type": "uint8" }
+        ]
+      },
+      { "indexed": false, "internalType": "uint8[27]", "name": "results", "type": "uint8[27]" },
+      { "indexed": false, "internalType": "uint256", "name": "totalBet", "type": "uint256" },
+      { "indexed": false, "internalType": "uint256", "name": "totalPayout", "type": "uint256" }
+    ],
+    "name": "Played",
+    "type": "event"
   }
 ];
 
