@@ -76,7 +76,22 @@
       type: "function"
     }
   ];
-
+  // Swap VIN <-> MON (1:100)
+  const SWAP_ABI = [
+  "function RATE() view returns (uint256)",
+  "function swapVINtoMON(uint256 vinAmount)",
+  "function swapMONtoVIN() payable"
+];
+  // Dice V2
+  // Choice: EVEN = 0, ODD = 1
+  const DICE_ABI = [
+  "function MIN_BET() view returns (uint256)",
+  "function MAX_BET() view returns (uint256)",
+  "function bankBalance() view returns (uint256)",
+  "function maxBetAllowed() view returns (uint256)",
+  "function play(uint256 amount, uint8 choice, uint256 clientSeed)",
+  "event Played(address indexed player,uint256 amount,uint8 choice,uint8 result,bool won)"
+];
   const LOTTO_ABI = [
   // constructor
   {
@@ -159,23 +174,6 @@
   }
 ];
 
-
-  // Swap VIN <-> MON (1:100)
-  const SWAP_ABI = [
-  "function RATE() view returns (uint256)",
-  "function swapVINtoMON(uint256 vinAmount)",
-  "function swapMONtoVIN() payable"
-];
-  // Dice V2
-  // Choice: EVEN = 0, ODD = 1
-  const DICE_ABI = [
-  "function MIN_BET() view returns (uint256)",
-  "function MAX_BET() view returns (uint256)",
-  "function bankBalance() view returns (uint256)",
-  "function maxBetAllowed() view returns (uint256)",
-  "function play(uint256 amount, uint8 choice, uint256 clientSeed)",
-  "event Played(address indexed player,uint256 amount,uint8 choice,uint8 result,bool won)"
-];
 
   // ===== Global State =====
   let rpcProvider = null;
