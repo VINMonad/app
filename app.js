@@ -512,41 +512,43 @@ function parseMonInput(str) {
   }
 
   function recalcSwapOutput() {
-    const { fromAmountEl, toAmountEl, statusEl } = getSwapInputElements();
-    if (!fromAmountEl || !toAmountEl) return;
+  const { fromAmountEl, toAmountEl, statusEl } = getSwapInputElements();
+  if (!fromAmountEl || !toAmountEl) return;
 
-    const raw = fromAmountEl.value.trim();
-    if (!raw) {
-      toAmountEl.value = "";
-      if (statusEl) statusEl.textContent = "";
-      return;
-    }
-
-    let fromBn;
-    if (swapDirection === "vinToMon") {
-      fromBn = parseVinInput(raw);
-    } else {
-      fromBn = parseMonInput(raw);
-    }
-
-    if (!fromBn || fromBn.lte(0)) {
-      toAmountEl.value = "";
-      if (statusEl) statusEl.textContent = "Invalid amount.";
-      return;
-    }
-
-    if (swapDirection === "vinToMon") {
-      toBn = fromBn.mul(100);
-    } else {
-      toBn = fromBn.div(100);
-    }
-    if (swapDirection === "vinToMon") {
-      toAmountEl.value = formatMonPlain(toBn, 6);
-    } else {
-      toAmountEl.value = formatVinPlain(toBn, 6);
-    }
-    if (statusEl) statusEl.textContent = "Ready to swap.";
+  const raw = fromAmountEl.value.trim();
+  if (!raw) {
+    toAmountEl.value = "";
+    if (statusEl) statusEl.textContent = "";
+    return;
   }
+
+  let fromBn;
+  if (swapDirection === "vinToMon") {
+    fromBn = parseVinInput(raw);
+  } else {
+    fromBn = parseMonInput(raw);
+  }
+
+  if (!fromBn || fromBn.lte(0)) {
+    toAmountEl.value = "";
+    if (statusEl) statusEl.textContent = "Invalid amount.";
+    return;
+  }
+
+  let toBn;
+  if (swapDirection === "vinToMon") {
+    // 1 VIN = 100 MON
+    toBn = fromBn.mul(100);
+    toAmountEl.value = formatMonPlain(toBn, 6);
+  } else {
+    // MON -> VIN
+    toBn = fromBn.div(100);
+    toAmountEl.value = formatVinPlain(toBn, 6);
+  }
+
+  if (statusEl) statusEl.textContent = "Ready to swap.";
+}
+
 
   async function handleSwapMax() {
     try {
