@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>VinMonDice – Swap & Dice on Monad</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="VinMonDice dApp on Monad: Swap VIN ↔ MON at 1:1, play on-chain Dice with VIN, and see real-time VIN/USD price."
+  />
+  <meta name="theme-color" content="#020617" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="logo128.png" />
+
+  <!-- Main stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Top Navigation -->
+    <header class="top-nav">
+      <div class="brand">
+        <img src="logo128.png" alt="VIN Logo" class="brand-logo" />
+        <div class="brand-text">
+          <div class="brand-title">VinMonDice</div>
+          <div class="brand-subtitle">Swap • Dice • On Monad</div>
+        </div>
+      </div>
+
+      <div class="nav-center">
+        <nav class="nav-links">
+          <button class="nav-link active" id="navHome">Home</button>
+          <button class="nav-link" id="navSwap">Swap</button>
+          <button class="nav-link" id="navDice">Dice</button>
+        </nav>
+      </div>
+
+      <div class="nav-right">
+        <div class="price-chip">
+          <span class="price-label">1 VIN ≈</span>
+          <span class="price-value" id="vinPriceUsd">Loading...</span>
+          <span class="price-label">USD</span>
+        </div>
+
+        <div class="network-indicator">
+          <span class="dot dot-disconnected" id="networkDot"></span>
+          <span class="network-label" id="networkName">Not connected</span>
+        </div>
+
+        <button class="btn btn-connect" id="connectButton">
+          Connect Wallet
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- HOME SCREEN -->
+      <section class="screen screen-active" id="home-screen">
+        <div class="hero-layout">
+          <div class="hero-card">
+            <div class="hero-main">             
+              <div class="hero-actions">
+                <button class="btn btn-primary" id="goToSwap">
+                  Swap VIN / MON
+                </button>
+                <button class="btn btn-secondary" id="goToDice">
+                  Play Dice
+                </button>
+              </div>
+
+              <div class="hero-wallet">
+                <div class="status-row">
+                  <span class="status-label">Wallet:</span>
+                  <span class="status-value" id="walletAddressShort">
+                    Not connected
+                  </span>
+                </div>
+                <div class="status-row">
+                  <span class="status-label">VIN Balance:</span>
+                  <span class="status-value" id="vinBalance">-</span>
+                </div>
+                <div class="status-row">
+                  <span class="status-label">MON Balance:</span>
+                  <span class="status-value" id="monBalance">-</span>
+                </div>
+                <!-- Show VIN reward pool (Dice bankroll) in Home wallet box -->
+                <div class="status-row">
+                  <span class="status-label">Dice Pool VIN:</span>
+                  <span class="status-value" id="globalDicePoolVin">
+                    Loading...
+                  </span>
+                </div>
+                <div class="status-row">
+                  <span class="status-label">Network:</span>
+                  <span class="status-value" id="networkNameHome">
+                    Not connected
+                  </span>
+                </div>
+                <button class="btn btn-outline" id="refreshBalances">
+                  Refresh Balances
+                </button>
+              </div>
+            </div>           
+          </div>        
+        </div>
+      </section>
+
+      <!-- SWAP SCREEN -->
+      <section class="screen" id="swap-screen">
+        <div class="screen-header">
+          <h1>Swap VIN ↔ MON</h1>        
+        </div>
+
+        <div class="swap-layout">
+          <div class="swap-card">
+            <div class="swap-header">
+              <div class="swap-tabs">
+                <button class="swap-tab active" id="tabVinToMon">
+                  VIN → MON
+                </button>
+                <button class="swap-tab" id="tabMonToVin">
+                  MON → VIN
+                </button>
+              </div>
+            </div>
+
+            <div class="swap-body">
+              <div class="swap-row">
+                <div class="swap-label-row">
+                  <span class="swap-label">From</span>
+                  <span class="swap-balance" id="fromBalanceLabel">
+                    Balance: -
+                  </span>
+                </div>
+                <div class="swap-input-row">
+                  <input
+                    type="text"
+                    inputmode="decimal"
+                    placeholder="0.0"
+                    id="swapFromAmount"
+                    class="swap-input"
+                  />
+                  <button class="swap-token-tag" id="swapFromToken">
+                    VIN
+                  </button>
+                  <button class="btn-max" id="swapMaxButton">
+                    MAX
+                  </button>
+                </div>
+              </div>
+
+              <div class="swap-row">
+                <div class="swap-label-row">
+                  <span class="swap-label">To</span>
+                  <span class="swap-balance" id="toBalanceLabel">
+                    Balance: -
+                  </span>
+                </div>
+                <div class="swap-input-row">
+                  <input
+                    type="text"
+                    placeholder="0.0"
+                    id="swapToAmount"
+                    class="swap-input"
+                    readonly
+                  />
+                  <button class="swap-token-tag" id="swapToToken">
+                    MON
+                  </button>
+                </div>
+              </div>
+
+              <button class="btn btn-primary btn-swap-action" id="swapActionButton">
+                Swap
+              </button>
+
+              <div class="tx-status" id="swapStatus">
+                Ready to swap.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DICE SCREEN -->
+      <section class="screen" id="dice-screen">
+        <div class="screen-header">
+          <h1>Dice Game (VIN)</h1>
+          <p class="screen-subtitle">
+            Bet VIN on Even or Odd. The outcome is decided on-chain using block
+            data. If you win, you get back 2× your bet (minus gas).
+          </p>
+        </div>
+
+        <div class="dice-layout">
+          <!-- Player & pool card -->
+          <div class="dice-card dice-card-left">
+            <div class="dice-section">
+              <h2>Your Wallet</h2>
+              <div class="status-row">
+                <span class="status-label">Wallet:</span>
+                <span class="status-value" id="diceWalletAddressShort">
+                  Not connected
+                </span>
+              </div>
+              <div class="status-row">
+                <span class="status-label">VIN Balance:</span>
+                <span class="status-value" id="diceVinBalance">
+                  -
+                </span>
+              </div>
+              <div class="status-row">
+                <span class="status-label">MON Balance:</span>
+                <span class="status-value" id="diceMonBalance">
+                  -
+                </span>
+              </div>
+              <!-- Show Dice allowance so user knows if they need to approve again -->
+              <div class="status-row">
+                <span class="status-label">Dice Allowance:</span>
+                <span class="status-value" id="diceAllowance">
+                  -
+                </span>
+              </div>
+            </div>
+
+            <div class="dice-section">
+              <h2>Reward Pool (VIN)</h2>
+              <div class="status-row">
+                <span class="status-label">Bankroll:</span>
+                <span class="status-value" id="dicePoolVinTop">
+                  Loading...
+                </span>
+              </div>
+              <p class="dice-note">
+                This is the VIN bankroll in the Dice contract used to pay winners.
+                Initially funded with 50,000,000 VIN.
+              </p>
+            </div>
+
+            <div class="dice-section">
+              <h2>Approval</h2>
+              <p class="dice-note">
+                Before playing, you must approve VIN for the Dice contract once.
+                The dApp will approve a large amount (for example 100,000,000 VIN)
+                so you do not need to approve every bet. You can always reduce
+                allowance later from your wallet.
+              </p>
+              <button class="btn btn-primary btn-full" id="diceApproveButton">
+                Approve VIN for Dice
+              </button>
+            </div>
+          </div>
+
+          <!-- Play card -->
+          <div class="dice-card dice-card-right">
+            <div class="dice-section">
+              <h2>Place Your Bet</h2>
+              <label class="dice-label" for="diceBetAmount">Bet Amount (VIN)</label>
+              <div class="dice-input-row">
+                <input
+                  type="text"
+                  inputmode="decimal"
+                  id="diceBetAmount"
+                  class="dice-input"
+                  placeholder="0.0"
+                  value="0.000001"
+                  lang="en"
+                  pattern="[0-9]*[.,]?[0-9]*"
+                  autocomplete="off"
+                  aria-label="Bet Amount in VIN"
+                />
+                <button class="btn-max" id="diceMaxButton">MAX</button>
+              </div>
+              
+<!-- Normalize swap decimal input (clean & optimized version) -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const el = document.getElementById('swapFromAmount');
+  if (!el) return;
+
+  el.addEventListener('input', (e) => {
+    let v = e.target.value;
+
+    // 1) Replace comma with dot (mobile keyboard)
+    v = v.replace(/,/g, '.');
+
+    // 2) Remove invalid chars (allow digits + dot)
+    v = v.replace(/[^\d.]/g, '');
+
+    // 3) Keep only the first dot
+    const parts = v.split('.');
+    if (parts.length > 1) {
+      v = parts.shift() + '.' + parts.join('');
+    }
+
+    // 4) Set back if changed
+    if (e.target.value !== v) {
+      const pos = e.target.selectionStart || v.length;
+      e.target.value = v;
+      try { e.target.setSelectionRange(pos, pos); } catch (_) {}
+    }
+
+    // 5) Trigger swap output update
+    if (typeof recalcSwapOutput === 'function') {
+      recalcSwapOutput();
+    }
+  });
+});
+</script>
+
+<!-- Normalise mobile decimal input (replace comma with dot, remove invalid chars, keep single dot) -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const diceInput = document.getElementById('diceBetAmount');
+  if (!diceInput) return;
+
+  diceInput.addEventListener('input', (e) => {
+    const cur = e.target.value;
+    // 1) replace commas with dots (mobile locales), 2) keep only digits and dots
+    let normalized = String(cur).replace(/,/g, '.').replace(/[^\d.]/g, '');
+    // 3) keep only first dot, remove any extra dots by joining remaining parts
+    const parts = normalized.split('.');
+    if (parts.length > 1) {
+      const intPart = parts.shift();
+      const fracPart = parts.join(''); // concatenate remaining parts (removes extra dots)
+      normalized = intPart + '.' + fracPart;
+    }
+    // 4) avoid replacing if same (to reduce caret jumps)
+    if (normalized !== cur) {
+      // try preserve caret position roughly
+      const pos = e.target.selectionStart || normalized.length;
+      e.target.value = normalized;
+      // set caret near previous position (clamped)
+      const newPos = Math.min(pos, normalized.length);
+      try { e.target.setSelectionRange(newPos, newPos); } catch (_) {}
+    }
+  });
+});
+</script>
+
+              <div class="dice-minimum-line" id="diceMinimumText">
+                Minimum bet: 0.000001 VIN. Maximum bet is the VIN balance currently available in the Reward Pool before you place your bet.
+              </div>
+            </div>
+
+            <div class="dice-section">
+              <h2>Choose your guess</h2>
+              <div class="dice-guess-buttons">
+                <button
+                  class="btn-toggle guess-button active"
+                  data-guess="even"
+                  id="guessEvenButton"
+                >
+                  Even
+                </button>
+                <button
+                  class="btn-toggle guess-button"
+                  data-guess="odd"
+                  id="guessOddButton"
+                >
+                  Odd
+                </button>
+              </div>
+            </div>
+
+            <div class="dice-section">
+              <div class="dice-tools">
+                <span class="dice-label">Quick tools</span>
+                <div class="dice-tool-buttons">
+                  <button class="btn-tool" id="diceRepeatButton">Repeat</button>
+                  <button class="btn-tool" id="diceHalfButton">½</button>
+                  <button class="btn-tool" id="diceDoubleButton">×2</button>
+                  <button class="btn-tool" id="diceClearButton">Clear</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Visual -->
+            <div class="dice-section">
+              <div class="dice-visual" id="diceVisual">
+                <div class="dice-orb"></div>
+                <div class="dice-coins">
+                  <span class="dice-coin dice-coin-white"></span>
+                  <span class="dice-coin dice-coin-red"></span>
+                  <span class="dice-coin dice-coin-white"></span>
+                  <span class="dice-coin dice-coin-red"></span>
+                </div>
+              </div>
+              <p class="dice-note">
+                The 4 coins are a visual effect. The real Even/Odd result is
+                computed on-chain from block data.
+              </p>
+            </div>
+
+            <div class="dice-section">
+              <button class="btn btn-primary btn-full" id="dicePlayButton">
+                Play Dice
+              </button>
+              <div class="tx-status" id="diceStatus">
+                Place your bet and choose Even or Odd to start.
+              </div>
+            </div>
+
+            <div class="dice-section dice-last-result">
+              <h2>Last Result</h2>
+              <div class="last-row">
+                <span class="last-label">Last roll:</span>
+                <span class="last-value" id="diceLastResult">-</span>
+              </div>
+              <div class="last-row">
+                <span class="last-label">Outcome:</span>
+                <span class="last-value" id="diceLastOutcome">-</span>
+              </div>
+              <div class="last-row">
+                <span class="last-label">You:</span>
+                <span class="last-value" id="diceLastWinLoss">-</span>
+              </div>
+              <div class="last-row">
+                <span class="last-label">Payout:</span>
+                <span class="last-value" id="diceLastPayout">-</span>
+              </div>
+              <div class="last-row">
+                <span class="last-label">Tx Hash:</span>
+                <span class="last-value" id="diceLastTx">-</span>
+              </div>
+              <button class="btn btn-outline" id="diceRefreshLast">
+                Refresh Last Game
+              </button>
+            </div>
+
+            <div class="dice-section">
+              <h2>Reward Pool</h2>
+              <p class="dice-note">
+                Reward Pool: <span id="dicePoolVin">Loading...</span>
+              </p>
+              <p class="dice-note">
+                All game results are on-chain. You can verify them through the
+                Monad block explorer using your wallet address and transaction hashes.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-main">
+        <span>© 2025 VinMonDice</span>
+        <span class="footer-dot">•</span>
+        <a
+          href="https://monadvision.com/token/0xfB71cbd8CB6f0fb72a9568f11e7E4454309A9cA1"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          VIN Token Contract
+        </a>
+        <span class="footer-dot">•</span>
+        <a
+          href="https://monadvision.com/address/0x11395DB7E0AcB7c56fE79FBAFFD48B5BeC896098"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Swap Contract
+        </a>
+        <span class="footer-dot">•</span>
+        <a
+          href="https://monadvision.com/address/0x245Fb6ECC6B2beCaf45AC15E4fAc8C78826f0F67"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Dice Contract
+        </a>
+      </div>
+      <div class="footer-links">
+        <a href="https://x.com/vinmondice" target="_blank" rel="noopener noreferrer">
+          Twitter
+        </a>
+        <span class="footer-dot">•</span>
+        <a href="https://t.me/vinmondice" target="_blank" rel="noopener noreferrer">
+          Telegram
+        </a>
+        <span class="footer-dot">•</span>
+        <a href="https://github.com/vinmondice" target="_blank" rel="noopener noreferrer">
+          GitHub
+        </a>
+        <span class="footer-dot">•</span>
+        <a
+          href="https://ipfs.io/ipfs/bafybeigh2cnllrenu3gbtn6qk2ctlqs54ibwqwewa4s56squkzpguhcsve"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          IPFS Link
+        </a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- VIN price (via CoinGecko, from MON price) -->
+  <script>
+    async function fetchVinPriceUsd() {
+      const label = document.getElementById("vinPriceUsd");
+      if (!label) return;
+
+      try {
+        label.textContent = "Loading...";
+        const res = await fetch(
+          "https://api.coingecko.com/api/v3/simple/price?ids=monad&vs_currencies=usd"
+        );
+        if (!res.ok) {
+          throw new Error("HTTP " + res.status);
+        }
+        const data = await res.json();
+        const monPrice = data && data.monad && data.monad.usd;
+        if (!monPrice) {
+          label.textContent = "N/A";
+          return;
+        }
+        // 1 VIN = 1 MON (1:1), so VIN price = MON price
+        label.textContent = monPrice.toFixed(4);
+      } catch (err) {
+        console.error("Error fetching VIN price (via MON):", err);
+        label.textContent = "N/A";
+      }
+    }
+
+    fetchVinPriceUsd();
+    setInterval(fetchVinPriceUsd, 60000);
+  </script>
+
+  <!-- Ethers.js (v5) and main dApp logic -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
