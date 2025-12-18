@@ -431,7 +431,7 @@ function parseMonInput(str) {
   async function updateDicePool() {
     try {
       initReadProvider();
-      const bankBal = await diceRead.getBankBalance();
+      const bankBal = await diceRead.bankBalance()
       const bankStr = formatVinDisplay(bankBal, 4);
       setText("globalDicePoolVin", `${bankStr} VIN`);
       setText("dicePoolVin", `${bankStr} VIN`);
