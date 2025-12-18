@@ -441,6 +441,132 @@ document.addEventListener('DOMContentLoaded', function () {
           </div>
         </div>
       </section>
+      <!-- LOTTO SCREEN -->
+<section class="screen" id="lotto-screen">
+
+  <div class="screen-header">
+    <h1>Lotto (VIN)</h1>
+    <p class="screen-subtitle">
+      Choose numbers from 00–99. Instant on-chain result.
+    </p>
+  </div>
+
+  <div class="lotto-layout">
+
+    <!-- LEFT: WALLET & POOL -->
+    <div class="lotto-card">
+      <h2>Your Wallet</h2>
+
+      <div class="status-row">
+        <span class="status-label">Wallet:</span>
+        <span class="status-value" id="lottoWallet">-</span>
+      </div>
+
+      <div class="status-row">
+        <span class="status-label">VIN Balance:</span>
+        <span class="status-value" id="lottoVinBalance">-</span>
+      </div>
+
+      <div class="status-row">
+        <span class="status-label">Lotto Pool:</span>
+        <span class="status-value" id="lottoPool">Loading...</span>
+      </div>
+
+      <div class="lotto-section">
+        <h3>Approval</h3>
+        <p class="lotto-note">
+          Approve VIN once to play Lotto.
+        </p>
+        <button class="btn btn-primary btn-full" id="lottoApproveBtn">
+          Approve VIN for Lotto
+        </button>
+      </div>
+    </div>
+
+    <!-- RIGHT: PLAY -->
+    <div class="lotto-card">
+
+      <!-- Bet type -->
+      <div class="lotto-section">
+        <h2>Bet Type</h2>
+        <div class="lotto-radio-group">
+          <label>
+            <input type="radio" name="lottoType" value="betone" checked />
+            BetOne (70×)
+          </label>
+          <label>
+            <input type="radio" name="lottoType" value="bet27" />
+            Bet27 (4× per hit)
+          </label>
+        </div>
+      </div>
+
+      <!-- Bet rows -->
+      <div class="lotto-section">
+        <h2>Your Numbers</h2>
+
+        <div id="lottoRows">
+          <!-- DEFAULT ROW -->
+          <div class="lotto-row">
+            <input type="number" min="0" max="99" placeholder="00–99" class="lotto-number" />
+            <input type="number" min="1" step="1" value="1" class="lotto-amount" />
+            <button class="btn-icon lotto-add">＋</button>
+            <button class="btn-icon lotto-remove">－</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total -->
+      <div class="lotto-section">
+        <div class="status-row">
+          <span class="status-label">Total Bet:</span>
+          <span class="status-value" id="lottoTotal">0 VIN</span>
+        </div>
+      </div>
+
+      <!-- Tools -->
+      <div class="lotto-section">
+        <div class="lotto-tools">
+          <button class="btn-tool" id="lottoHalf">½</button>
+          <button class="btn-tool" id="lottoDouble">×2</button>
+          <button class="btn-tool" id="lottoClear">Clear</button>
+        </div>
+      </div>
+
+      <!-- Play -->
+      <div class="lotto-section">
+        <button class="btn btn-primary btn-full" id="lottoPlayBtn">
+          Play Lotto
+        </button>
+      </div>
+
+      <!-- Result -->
+      <div class="lotto-section">
+        <h2>Result</h2>
+        <div class="lotto-result" id="lottoResult">
+          Waiting for play…
+        </div>
+        <div class="lotto-hash" id="lottoTxHash"></div>
+      </div>
+
+      <!-- Decode -->
+      <div class="lotto-section">
+        <h2>Decode Result</h2>
+        <input
+          type="text"
+          placeholder="Paste transaction hash"
+          id="lottoDecodeInput"
+          class="lotto-input"
+        />
+        <button class="btn btn-secondary btn-full" id="lottoDecodeBtn">
+          Decode
+        </button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
     </main>
 
     <!-- Footer -->
