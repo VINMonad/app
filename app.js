@@ -77,6 +77,89 @@
     }
   ];
 
+  const LOTTO_ABI = [
+  // constructor
+  {
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+
+  // event Played
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true,  "internalType": "address",   "name": "player",      "type": "address" },
+      { "indexed": false, "internalType": "bool",      "name": "bet27",       "type": "bool" },
+      { "indexed": false, "internalType": "uint8[]",   "name": "numbers",     "type": "uint8[]" },
+      { "indexed": false, "internalType": "uint256[]", "name": "amounts",     "type": "uint256[]" },
+      { "indexed": false, "internalType": "uint8[27]", "name": "results",     "type": "uint8[27]" },
+      { "indexed": false, "internalType": "uint256",   "name": "totalBet",    "type": "uint256" },
+      { "indexed": false, "internalType": "uint256",   "name": "totalPayout", "type": "uint256" }
+    ],
+    "name": "Played",
+    "type": "event"
+  },
+
+  // view
+  {
+    "inputs": [],
+    "name": "MIN_BET",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "RESULTS_COUNT",
+    "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "VIN",
+    "outputs": [{ "internalType": "contract IERC20", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+
+  // play
+  {
+    "inputs": [
+      { "internalType": "bool",      "name": "bet27",   "type": "bool" },
+      { "internalType": "uint8[]",   "name": "numbers", "type": "uint8[]" },
+      { "internalType": "uint256[]", "name": "amounts", "type": "uint256[]" }
+    ],
+    "name": "play",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+
+  // maxPossiblePayout
+  {
+    "inputs": [
+      { "internalType": "bool",        "name": "bet27",  "type": "bool" },
+      { "internalType": "uint256[]",   "name": "amounts","type": "uint256[]" }
+    ],
+    "name": "maxPossiblePayout",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+
+  // withdraw
+  {
+    "inputs": [{ "internalType": "uint256", "name": "amount", "type": "uint256" }],
+    "name": "withdraw",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+];
+
+
   // Swap VIN <-> MON (1:100)
   const SWAP_ABI = [
   "function RATE() view returns (uint256)",
