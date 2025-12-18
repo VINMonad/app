@@ -717,10 +717,10 @@ function parseMonInput(str) {
         }
 
         statusEl.textContent = "Sending VIN→MON swap transaction...";
-        const gasEstimate = await swapWrite.estimateGas.swapVinForMon(amountBN);
+        const gasEstimate = await swapWrite.estimateGas.swapVINtoMON(amountBN);
         const gasLimit = gasEstimate.mul(120).div(100);
 
-        const tx = await swapWrite.swapVinForMon(amountBN, { gasLimit });
+        const tx = await swapWrite.swapVINtoMON(amountBN, { gasLimit });
         const receipt = await tx.wait();
         if (receipt.status !== 1) {
           statusEl.textContent = "Swap transaction reverted.";
