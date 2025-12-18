@@ -993,3 +993,169 @@ body {
     display: inline-flex !important;
   }
 }
+
+/* =========================================================
+   LOTTO STYLES
+   These styles are ONLY for the Lotto screen.
+   Once added, style.css can be considered FINAL.
+   ========================================================= */
+
+/* Lotto table header */
+.lotto-table-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.4fr 32px;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-bottom: 0.35rem;
+  padding: 0 0.1rem;
+}
+
+/* Lotto rows container */
+#lottoRows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+/* Single lotto row */
+.lotto-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.4fr 32px;
+  gap: 0.4rem;
+  align-items: center;
+  padding: 0.35rem;
+  border-radius: 0.75rem;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+/* Number input (00–99) */
+.lotto-number {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #f9fafb;
+  font-size: 0.9rem;
+  text-align: center;
+}
+.lotto-number::placeholder {
+  color: #6b7280;
+}
+
+/* Amount input (VIN) */
+.lotto-amount {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #f9fafb;
+  font-size: 0.9rem;
+  text-align: right;
+  padding-right: 0.2rem;
+}
+.lotto-amount::placeholder {
+  color: #6b7280;
+}
+
+/* Bet type (radio buttons) */
+.lotto-type {
+  display: flex;
+  gap: 0.4rem;
+  justify-content: space-between;
+}
+.lotto-type label {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  color: #e5e7eb;
+}
+.lotto-type input[type="radio"] {
+  accent-color: #6366f1;
+  cursor: pointer;
+}
+
+/* Remove row button */
+.btn-remove-row {
+  border: none;
+  outline: none;
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-remove-row:hover {
+  background: rgba(239, 68, 68, 0.3);
+  color: #fecaca;
+}
+
+/* Lotto total bet highlight */
+#lottoTotalBet {
+  font-weight: 600;
+  color: #facc15;
+}
+
+/* Lotto status text */
+#lottoStatus {
+  margin-top: 0.3rem;
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+/* Lotto result box */
+#lottoResultDetail {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #e5e7eb;
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+  background: rgba(2, 6, 23, 0.8);
+  border: 1px dashed rgba(148, 163, 184, 0.35);
+}
+
+/* Error state for invalid row */
+.lotto-row.lotto-error {
+  border-color: rgba(239, 68, 68, 0.8);
+  background: rgba(127, 29, 29, 0.35);
+}
+
+/* Disabled state (used later by JS) */
+.lotto-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* =======================
+   MOBILE RESPONSIVE
+   ======================= */
+@media (max-width: 640px) {
+  .lotto-table-header {
+    grid-template-columns: 1fr 1fr 1fr 28px;
+    font-size: 0.7rem;
+  }
+
+  .lotto-row {
+    grid-template-columns: 1fr 1fr 1fr 28px;
+    gap: 0.3rem;
+    padding: 0.3rem;
+  }
+
+  .lotto-type {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+  }
+
+  .btn-remove-row {
+    width: 24px;
+    height: 24px;
+    font-size: 0.8rem;
+  }
+}
