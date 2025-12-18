@@ -319,7 +319,7 @@ function parseMonInput(str) {
       );
     }
   }
-      if (!lottoRead) {
+    if (!lottoRead) {
       lottoRead = new ethers.Contract(
         LOTTO_CONTRACT_ADDRESS,
         LOTTO_ABI,
@@ -334,6 +334,12 @@ function parseMonInput(str) {
     swapWrite = new ethers.Contract(SWAP_CONTRACT_ADDRESS, SWAP_ABI, signer);
     diceWrite = new ethers.Contract(DICE_CONTRACT_ADDRESS, DICE_ABI, signer);
   }
+    lottoWrite = new ethers.Contract(
+    LOTTO_CONTRACT_ADDRESS,
+    LOTTO_ABI,
+    signer
+  );
+
 
   // ===== Network =====
   async function ensureMonadNetwork() {
