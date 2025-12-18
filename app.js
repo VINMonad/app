@@ -1,8 +1,9 @@
 // app.js - VinMonDice dApp logic (Swap & Dice)
 // Network: Monad (chainId 143)
-// VINTokenV2: 0xfB71cbd8CB6f0fb72a9568f11e7E4454309A9cA1
-// Swap V2:    0x11395DB7E0AcB7c56fE79FBAFFD48B5BeC896098
-// Dice V2:    0x245Fb6ECC6B2beCaf45AC15E4fAc8C78826f0F67
+// VIN:     0x038A2f1abe221d403834aa775669169Ef5eb120A
+// Swap:    0x73a8C8Bf994A53DaBb9aE707cD7555DFD1909fbB
+// DiceV3:  0x245Fb6ECC6B2beCaf45AC15E4fAc8C78826f0F67
+// LottoV5: 0x245Fb6ECC6B2beCaf45AC15E4fAc8C78826f0F67
 
 (() => {
   "use strict";
@@ -12,16 +13,17 @@
   const MONAD_CHAIN_ID_DEC = 143;
   const MONAD_CHAIN_ID_HEX = "0x8f"; // 143 in hex
 
-  const VIN_TOKEN_ADDRESS = "0xfB71cbd8CB6f0fb72a9568f11e7E4454309A9cA1";
-  const SWAP_CONTRACT_ADDRESS = "0x11395DB7E0AcB7c56fE79FBAFFD48B5BeC896098";
-  const DICE_CONTRACT_ADDRESS = "0x245Fb6ECC6B2beCaf45AC15E4fAc8C78826f0F67";
+  const VIN_TOKEN_ADDRESS = "0x038A2f1abe221d403834aa775669169Ef5eb120A";
+  const SWAP_CONTRACT_ADDRESS = "0x73a8C8Bf994A53DaBb9aE707cD7555DFD1909fbB";
+  const DICE_CONTRACT_ADDRESS = "0xB8D7D799eE31FedD38e63801419782E8110326E4";
+  const LOTTO_CONTRACT_ADDRESS = "0x85993C463f2b4a8656871891b463AeA79734ab27";
 
   const MON_DECIMALS = 18; // native MON uses 18 decimals
   let VIN_DECIMALS = 18;   // will be read from VIN token on init
 
   // ===== ABIs (minimal) =====
 
-  // VINTokenV2 (ERC20)
+  // VIN (ERC20)
   const VIN_ABI = [
     {
       constant: true,
@@ -74,118 +76,210 @@
     }
   ];
 
-  // Swap MON <-> VIN (1:1)
   const SWAP_ABI = [
-    {
-      inputs: [],
-      name: "getMonReserve",
-      outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-      stateMutability: "view",
-      type: "function"
-    },
-    {
-      inputs: [],
-      name: "getVinReserve",
-      outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-      stateMutability: "view",
-      type: "function"
-    },
-    {
-      inputs: [],
-      name: "swapMonForVin",
-      outputs: [],
-      stateMutability: "payable",
-      type: "function"
-    },
-    {
-      inputs: [{ internalType: "uint256", name: "vinAmount", type: "uint256" }],
-      name: "swapVinForMon",
-      outputs: [],
-      stateMutability: "nonpayable",
-      type: "function"
-    }
-  ];
-
-  // Dice V2
-  // Choice: EVEN = 0, ODD = 1
+  {
+    inputs: [],
+    name: "getMonReserve",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    inputs: [],
+    name: "getVinReserve",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    inputs: [],
+    name: "swapMonForVin",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function"
+  },
+  {
+    inputs: [{ internalType: "uint256", name: "vinAmount", type: "uint256" }],
+    name: "swapVinForMon",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function"
+  }
+];
+  
   const DICE_ABI = [
-    {
-      inputs: [],
-      name: "MIN_BET",
-      outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-      stateMutability: "view",
-      type: "function"
-    },
-    {
-      inputs: [],
-      name: "VIN_TOKEN",
-      outputs: [{ internalType: "address", name: "", type: "address" }],
-      stateMutability: "view",
-      type: "function"
-    },
-    {
-      inputs: [],
-      name: "getBankBalance",
-      outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-      stateMutability: "view",
-      type: "function"
-    },
-    {
-      inputs: [],
-      name: "getMaxBet",
-      outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-      stateMutability: "view",
-      type: "function"
-    },
-    {
-      inputs: [
-        { internalType: "uint256", name: "amount", type: "uint256" },
-        { internalType: "uint8", name: "choice", type: "uint8" },
-        { internalType: "uint256", name: "clientSeed", type: "uint256" }
-      ],
-      name: "play",
-      outputs: [],
-      stateMutability: "nonpayable",
-      type: "function"
-    },
-    {
-      anonymous: false,
-      inputs: [
-        {
-          indexed: true,
-          internalType: "address",
-          name: "player",
-          type: "address"
-        },
-        {
-          indexed: false,
-          internalType: "uint256",
-          name: "amount",
-          type: "uint256"
-        },
-        {
-          indexed: false,
-          internalType: "uint8",
-          name: "choice",
-          type: "uint8"
-        },
-        {
-          indexed: false,
-          internalType: "uint8",
-          name: "result",
-          type: "uint8"
-        },
-        {
-          indexed: false,
-          internalType: "bool",
-          name: "won",
-          type: "bool"
-        }
-      ],
-      name: "Played",
-      type: "event"
-    }
-  ];
+  {
+    inputs: [],
+    name: "MIN_BET",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    inputs: [],
+    name: "VIN_TOKEN",
+    outputs: [{ internalType: "address", name: "", type: "address" }],
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    inputs: [],
+    name: "getBankBalance",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    inputs: [],
+    name: "getMaxBet",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    inputs: [
+      { internalType: "uint256", name: "amount", type: "uint256" },
+      { internalType: "uint8", name: "choice", type: "uint8" },
+      { internalType: "uint256", name: "clientSeed", type: "uint256" }
+    ],
+    name: "play",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function"
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "player",
+        type: "address"
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256"
+      },
+      {
+        indexed: false,
+        internalType: "uint8",
+        name: "choice",
+        type: "uint8"
+      },
+      {
+        indexed: false,
+        internalType: "uint8",
+        name: "result",
+        type: "uint8"
+      },
+      {
+        indexed: false,
+        internalType: "bool",
+        name: "won",
+        type: "bool"
+      }
+    ],
+    name: "Played",
+    type: "event"
+  }
+];
+  
+const LOTTO_ABI = [
+  {
+    inputs: [],
+    name: "MIN_BET",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    inputs: [],
+    name: "RESULTS_COUNT",
+    outputs: [{ internalType: "uint8", name: "", type: "uint8" }],
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    inputs: [],
+    name: "VIN",
+    outputs: [{ internalType: "contract IERC20", name: "", type: "address" }],
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    inputs: [
+      {
+        components: [
+          { internalType: "uint8", name: "number", type: "uint8" },
+          { internalType: "uint256", name: "amount", type: "uint256" },
+          { internalType: "uint8", name: "betType", type: "uint8" }
+        ],
+        internalType: "struct VINLottoV5.Bet[]",
+        name: "bets",
+        type: "tuple[]"
+      }
+    ],
+    name: "maxPossiblePayout",
+    outputs: [{ internalType: "uint256", name: "maxPayout", type: "uint256" }],
+    stateMutability: "pure",
+    type: "function"
+  },
+  {
+    inputs: [],
+    name: "nonce",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    inputs: [],
+    name: "owner",
+    outputs: [{ internalType: "address", name: "", type: "address" }],
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    inputs: [
+      {
+        components: [
+          { internalType: "uint8", name: "number", type: "uint8" },
+          { internalType: "uint256", name: "amount", type: "uint256" },
+          { internalType: "uint8", name: "betType", type: "uint8" }
+        ],
+        internalType: "struct VINLottoV5.Bet[]",
+        name: "bets",
+        type: "tuple[]"
+      }
+    ],
+    name: "play",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function"
+  },
+  {
+    inputs: [],
+    name: "renounceOwnership",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function"
+  },
+  {
+    inputs: [{ internalType: "address", name: "newOwner", type: "address" }],
+    name: "transferOwnership",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function"
+  },
+  {
+    inputs: [{ internalType: "uint256", name: "amount", type: "uint256" }],
+    name: "withdraw",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function"
+  }
+];
 
   // ===== Global State =====
   let rpcProvider = null;
