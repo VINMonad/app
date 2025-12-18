@@ -1524,23 +1524,27 @@ function bindLottoButtons() {
     }
   }
 
-  // ===== Init =====
-  async function initApp() {
-    try {
-      initReadProvider();
-      setNetworkStatus(false);
+// ===== Init =====
+async function initApp() {
+  try {
+    initReadProvider();
+    setNetworkStatus(false);
 
-      initNav();
-      initSwapEvents();
-      initDiceEvents();
-      initWalletEvents();
+    initNav();
+    initSwapEvents();
+    initDiceEvents();
+    initWalletEvents();
 
-      await updateDicePool();
-      updateDiceLastResultUI();
-    } catch (err) {
-      console.error("initApp error:", err);
-    }
+    // ===== ADD LOTTO INIT HERE =====
+    initLottoUI();
+    bindLottoButtons();
+
+    await updateDicePool();
+    updateDiceLastResultUI();
+  } catch (err) {
+    console.error("initApp error:", err);
   }
+}
 
-  document.addEventListener("DOMContentLoaded", initApp);
+document.addEventListener("DOMContentLoaded", initApp);
 })();
