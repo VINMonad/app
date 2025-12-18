@@ -396,6 +396,7 @@ function parseMonInput(str) {
     const navHome = $("navHome");
     const navSwap = $("navSwap");
     const navDice = $("navDice");
+    const navLotto = $("navLotto");
 
     if (navHome && navSwap && navDice) {
       navHome.classList.remove("active");
