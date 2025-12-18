@@ -122,6 +122,20 @@ const LOTTO_ABI = [
   let diceMaxBetBN = null;
   let diceAllowanceBN = null;
   let lastDiceGame = null;
+    // ===== Lotto State =====
+  let lottoRead = null;
+  let lottoWrite = null;
+
+  // Current bet rows (UI → contract)
+  // Each item: { number: uint8, amountBN: BigNumber, betType: 0|1 }
+  let lottoBets = [];
+
+  // Cached on-chain data
+  let lottoMinBetBN = null;
+
+  // Last played result (for UI display)
+  let lastLottoGame = null;
+
 
   let swapDirection = "vinToMon"; // "vinToMon" or "monToVin"
 
