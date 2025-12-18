@@ -319,6 +319,14 @@ function parseMonInput(str) {
       );
     }
   }
+      if (!lottoRead) {
+      lottoRead = new ethers.Contract(
+        LOTTO_CONTRACT_ADDRESS,
+        LOTTO_ABI,
+        rpcProvider
+      );
+    }
+
 
   function initWriteContracts() {
     if (!web3Provider || !signer) return;
