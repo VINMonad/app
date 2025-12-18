@@ -649,7 +649,7 @@ function parseMonInput(str) {
         });
         const gasLimit = gasEstimate.mul(120).div(100);
 
-        const tx = await swapWrite.swapMonForVin({
+        const tx = await swapWrite.swapMONtoVIN({
           value: amountBN,
           gasLimit
         });
