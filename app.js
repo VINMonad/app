@@ -1264,6 +1264,12 @@ function initWriteContracts() {
     // Default guess = EVEN
     onGuessButtonClick(true);
   }
+  
+  // ===== Lotto: basic init =====
+function initLottoUI() {
+  renderLottoRows();
+}
+
 
   // ===== Wallet =====
   async function connectWallet() {
