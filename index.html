@@ -452,6 +452,117 @@ document.addEventListener('DOMContentLoaded', function () {
           </div>
         </div>
       </section>
+            <!-- LOTTO SCREEN -->
+<section class="screen" id="lotto-screen">
+  <div class="screen-header">
+    <h1>Lotto Game (VIN)</h1>
+    <p class="screen-subtitle">
+      Pick numbers (00–99), choose BetOne or Bet27, and play fully on-chain.
+    </p>
+  </div>
+
+  <div class="dice-layout">
+    <!-- LEFT: BET FORM -->
+    <div class="dice-card dice-card-left">
+      <div class="dice-section">
+        <h2>Your Bets</h2>
+
+        <div class="lotto-table-header">
+          <div>Number</div>
+          <div>VIN</div>
+          <div>Type</div>
+          <div></div>
+        </div>
+
+        <div id="lottoRows">
+          <!-- Default row -->
+          <div class="lotto-row">
+            <input
+              type="text"
+              class="lotto-number"
+              placeholder="00–99"
+              maxlength="2"
+            />
+
+            <input
+              type="text"
+              class="lotto-amount"
+              placeholder="1–50"
+            />
+
+            <div class="lotto-type">
+              <label>
+                <input type="radio" name="lottoType0" value="betone" checked />
+                BetOne
+              </label>
+              <label>
+                <input type="radio" name="lottoType0" value="bet27" />
+                Bet27
+              </label>
+            </div>
+
+            <button class="btn-remove-row">✕</button>
+          </div>
+        </div>
+
+        <button class="btn btn-outline btn-full" id="addLottoRow">
+          + Add Row
+        </button>
+      </div>
+
+      <div class="dice-section">
+        <div class="status-row">
+          <span class="status-label">Total Bet:</span>
+          <span class="status-value" id="lottoTotalBet">
+            0 VIN
+          </span>
+        </div>
+
+        <div class="dice-tools">
+          <span class="dice-label">Quick tools</span>
+          <div class="dice-tool-buttons">
+            <button class="btn-tool" id="lottoHalf">½</button>
+            <button class="btn-tool" id="lottoDouble">×2</button>
+            <button class="btn-tool" id="lottoClear">Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="dice-section">
+        <button class="btn btn-primary btn-full" id="lottoPlayButton">
+          Play Lotto
+        </button>
+        <div class="tx-status" id="lottoStatus">
+          Ready.
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: RESULT -->
+    <div class="dice-card dice-card-right">
+      <div class="dice-section">
+        <h2>Last Result</h2>
+        <div id="lottoResultDetail">
+          No result yet.
+        </div>
+      </div>
+
+      <div class="dice-section">
+        <h2>Decode Past Game</h2>
+        <input
+          type="text"
+          class="swap-input"
+          id="lottoTxHashInput"
+          placeholder="Paste transaction hash"
+        />
+        <button class="btn btn-outline btn-full" id="decodeLottoTx">
+          Decode
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
     </main>
 
     <!-- Footer -->
