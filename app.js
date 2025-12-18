@@ -261,6 +261,37 @@ function parseMonInput(str) {
     }
     return "";
   }
+    // ===== Lotto Helpers =====
+
+  // Parse lotto number (00–99)
+  function parseLottoNumber(str) {
+    if (str === null || str === undefined) return null;
+    const s = String(str).trim();
+    if (!/^\d{1,2}$/.test(s)) return null;
+    const n = Number(s);
+    if (n < 0 || n > 99) return null;
+    return n;
+  }
+
+  // Parse bet type string to enum
+  // betone = 0, bet27 = 1
+  function parseLottoBetType(value) {
+    if (value === "betone") return 0;
+    if (value === "bet27") return 1;
+    return null;
+  }
+
+  // Check duplicate bets:
+  // same number + same betType is NOT allowed
+  function hasDuplicateLottoBets(bets) {
+    const seen = new Set();
+    for (const b of bets) {
+      const key = `${b.number}-${b.betType}`;
+      if (seen.has(key)) return true;
+      seen.add(key);
+    }
+    return false;
+  }
 
   // ===== Providers & Contracts =====
   function initReadProvider() {
