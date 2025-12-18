@@ -636,37 +636,42 @@ document.addEventListener('DOMContentLoaded', function () {
     </footer>
   </div>
 
-  <!-- VIN price (via CoinGecko, from MON price) -->
-  <script>
-    async function fetchVinPriceUsd() {
-      const label = document.getElementById("vinPriceUsd");
-      if (!label) return;
+ <!-- VIN price (derived from MON price, 1 VIN = 100 MON) -->
+<script>
+  async function fetchVinPriceUsd() {
+    const label = document.getElementById("vinPriceUsd");
+    if (!label) return;
 
-      try {
-        label.textContent = "Loading...";
-        const res = await fetch(
-          "https://api.coingecko.com/api/v3/simple/price?ids=monad&vs_currencies=usd"
-        );
-        if (!res.ok) {
-          throw new Error("HTTP " + res.status);
-        }
-        const data = await res.json();
-        const monPrice = data && data.monad && data.monad.usd;
-        if (!monPrice) {
-          label.textContent = "N/A";
-          return;
-        }
-        // 1 VIN = 1 MON (1:1), so VIN price = MON price
-        label.textContent = monPrice.toFixed(4);
-      } catch (err) {
-        console.error("Error fetching VIN price (via MON):", err);
-        label.textContent = "N/A";
+    try {
+      label.textContent = "Loading...";
+
+      const res = await fetch(
+        "https://api.coingecko.com/api/v3/simple/price?ids=monad&vs_currencies=usd"
+      );
+      if (!res.ok) {
+        throw new Error("HTTP " + res.status);
       }
-    }
 
-    fetchVinPriceUsd();
-    setInterval(fetchVinPriceUsd, 60000);
-  </script>
+      const data = await res.json();
+      const monPrice = data?.monad?.usd;
+      if (!monPrice) {
+        label.textContent = "N/A";
+        return;
+      }
+
+      // Swap rate: 1 VIN = 100 MON
+      const vinPrice = monPrice * 100;
+
+      label.textContent = vinPrice.toFixed(4);
+    } catch (err) {
+      console.error("Error fetching VIN price (via MON):", err);
+      label.textContent = "N/A";
+    }
+  }
+
+  fetchVinPriceUsd();
+  setInterval(fetchVinPriceUsd, 60000);
+</script>
 
   <!-- Ethers.js (v5) and main dApp logic -->
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
