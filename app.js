@@ -535,7 +535,11 @@ function parseMonInput(str) {
       return;
     }
 
-    const toBn = fromBn; // 1:1
+    if (swapDirection === "vinToMon") {
+      toBn = fromBn.mul(100);
+    } else {
+      toBn = fromBn.div(100);
+    }
     if (swapDirection === "vinToMon") {
       toAmountEl.value = formatMonPlain(toBn, 6);
     } else {
