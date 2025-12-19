@@ -461,12 +461,40 @@ document.addEventListener('DOMContentLoaded', function () {
     </p>
   </div>
 
-  <div class="dice-layout">
+  <div class="lotto-layout">
     <!-- LEFT: BET FORM -->
-    <div class="dice-card dice-card-left">
-      <div class="dice-section">
-        <h2>Your Bets</h2>
+    <div class="lotto-card lotto-card-left">
+      <div class="lotto-section">
+        <h2>Your Wallet</h2>
+        <div class="status-row">
+          <span class="status-label">Wallet:</span>
+          <span class="status-value" id="lottoWalletAddressShort">
+            Not connected
+          </span>
+        </div>
+        <div class="status-row">
+          <span class="status-label">VIN Balance:</span>
+          <span class="status-value" id="lottoVinBalance">-</span>
+        </div>
+        <div class="status-row">
+          <span class="status-label">MON Balance:</span>
+          <span class="status-value" id="lottoMonBalance">-</span>
+        </div>
+        <div class="status-row">
+          <span class="status-label">Dice Allowance:</span>
+          <span class="status-value" id="lottoAllowance">-</span>
+        </div>
+        <div class="status-row">
+          <span class="status-label">Lotto Pool VIN:</span>
+          <span class="status-value" id="lottoPoolVin">-</span>
+        </div>
+        <button class="btn btn-primary btn-full" id="lottoApproveButton">
+          Approve VIN for Lotto
+        </button>
+      </div>
 
+      <div class="lotto-section">
+        <h2>Your Bets</h2>
         <div class="lotto-table-header">
           <div>Number</div>
           <div>VIN</div>
@@ -483,13 +511,11 @@ document.addEventListener('DOMContentLoaded', function () {
               placeholder="00–99"
               maxlength="2"
             />
-
             <input
               type="text"
               class="lotto-amount"
               placeholder="1–50"
             />
-
             <div class="lotto-type">
               <label>
                 <input type="radio" name="lottoType0" value="betone" checked />
@@ -500,7 +526,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 Bet27
               </label>
             </div>
-
             <button class="btn-remove-row">✕</button>
           </div>
         </div>
@@ -510,7 +535,7 @@ document.addEventListener('DOMContentLoaded', function () {
         </button>
       </div>
 
-      <div class="dice-section">
+      <div class="lotto-section">
         <div class="status-row">
           <span class="status-label">Total Bet:</span>
           <span class="status-value" id="lottoTotalBet">
@@ -518,9 +543,9 @@ document.addEventListener('DOMContentLoaded', function () {
           </span>
         </div>
 
-        <div class="dice-tools">
-          <span class="dice-label">Quick tools</span>
-          <div class="dice-tool-buttons">
+        <div class="lotto-tools">
+          <span class="lotto-label">Quick tools</span>
+          <div class="lotto-tool-buttons">
             <button class="btn-tool" id="lottoHalf">½</button>
             <button class="btn-tool" id="lottoDouble">×2</button>
             <button class="btn-tool" id="lottoClear">Clear</button>
@@ -528,7 +553,7 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
       </div>
 
-      <div class="dice-section">
+      <div class="lotto-section">
         <button class="btn btn-primary btn-full" id="lottoPlayButton">
           Play Lotto
         </button>
@@ -539,15 +564,15 @@ document.addEventListener('DOMContentLoaded', function () {
     </div>
 
     <!-- RIGHT: RESULT -->
-    <div class="dice-card dice-card-right">
-      <div class="dice-section">
+    <div class="lotto-card lotto-card-right">
+      <div class="lotto-section">
         <h2>Last Result</h2>
         <div id="lottoResultDetail">
           No result yet.
         </div>
       </div>
 
-      <div class="dice-section">
+      <div class="lotto-section">
         <h2>Decode Past Game</h2>
         <input
           type="text"
