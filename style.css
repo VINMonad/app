@@ -999,7 +999,6 @@ body {
    These styles are ONLY for the Lotto screen.
    Once added, style.css can be considered FINAL.
    ========================================================= */
-
 /* Lotto table header */
 .lotto-table-header {
   display: grid;
