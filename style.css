@@ -1,4 +1,15 @@
-/* Base reset & typography */
+/* ============================================================
+   VINMonad - style.css
+   Mobile-first, desktop-polished
+   Designed for: Swap • Dice • Lotto
+   Notes:
+   - English-only code/comments
+   - No HTML/JS changes required
+============================================================ */
+
+/* =========================
+   CSS Reset & Base
+========================= */
 *,
 *::before,
 *::after {
@@ -7,47 +18,125 @@
 
 html,
 body {
-  margin: 0;
-  padding: 0;
   height: 100%;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, sans-serif;
-  background: radial-gradient(circle at top, #020617 0, #020617 45%, #000 100%);
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
   color: #e5e7eb;
+  background: radial-gradient(circle at top, #020617 0, #020617 45%, #000 100%);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Better tap/scroll experience on mobile */
+button,
+input {
+  font: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
 /* Scrollbar (optional) */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
+  height: 10px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1f2937;
-  border-radius: 4px;
+  background: rgba(148, 163, 184, 0.25);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.35);
 }
 
-/* App shell */
+/* =========================
+   Design Tokens
+========================= */
+:root {
+  --bg-0: #000;
+  --bg-1: #020617;
+  --bg-2: #0f172a;
+  --bg-3: rgba(15, 23, 42, 0.92);
+
+  --card: radial-gradient(circle at top, #0f172a 0, #020617 70%);
+  --card-strong: radial-gradient(circle at top left, #1e293b 0, #020617 55%, #000
+        100%);
+
+  --text-1: #f9fafb;
+  --text-2: #e5e7eb;
+  --text-3: #cbd5e1;
+  --muted: #9ca3af;
+
+  --line-1: rgba(148, 163, 184, 0.35);
+  --line-2: rgba(148, 163, 184, 0.25);
+
+  --shadow-1: 0 18px 40px rgba(15, 23, 42, 0.7);
+  --shadow-2: 0 10px 30px rgba(37, 99, 235, 0.25);
+
+  --primary-a: #2563eb;
+  --primary-b: #7c3aed;
+
+  --success: #22c55e;
+  --danger: #ef4444;
+  --warn: #facc15;
+
+  --radius-1: 10px;
+  --radius-2: 14px;
+  --radius-3: 18px;
+  --pill: 999px;
+
+  /* Touch-friendly sizing */
+  --tap: 44px;
+
+  /* Layout */
+  --page-max: 1200px;
+  --gap-1: 10px;
+  --gap-2: 14px;
+  --gap-3: 18px;
+}
+
+/* =========================
+   App Shell
+========================= */
 .app-shell {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-/* Top Navigation */
+/* =========================
+   Top Navigation
+========================= */
 .top-nav {
   position: sticky;
   top: 0;
-  z-index: 20;
+  z-index: 50;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.6rem 1rem;
+  gap: var(--gap-1);
+
+  padding: 10px 12px;
   background: rgba(15, 23, 42, 0.96);
   backdrop-filter: blur(14px);
   border-bottom: 1px solid rgba(148, 163, 184, 0.15);
@@ -57,142 +146,176 @@ body {
 .brand {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 10px;
+  min-width: 0;
 }
 .brand-logo {
-  width: 32px;
-  height: 32px;
-  border-radius: 999px;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--pill);
+  flex: 0 0 auto;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.35);
 }
 .brand-text {
   display: flex;
   flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 .brand-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #e5e7eb;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-1);
+  line-height: 1.05;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .brand-subtitle {
-  font-size: 0.75rem;
-  color: #9ca3af;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Nav links */
+/* Center nav (hidden on small screens by default in your HTML) */
 .nav-center {
   display: none;
 }
+
+/* Nav links */
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 6px;
 }
 .nav-link {
   border: none;
   outline: none;
-  padding: 0.35rem 0.8rem;
-  border-radius: 999px;
+  padding: 8px 12px;
+  border-radius: var(--pill);
   background: transparent;
-  color: #9ca3af;
-  font-size: 0.85rem;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform 0.12s ease, background 0.12s ease,
+    color 0.12s ease, box-shadow 0.12s ease;
   white-space: nowrap;
 }
 .nav-link:hover {
   background: rgba(31, 41, 55, 0.7);
-  color: #e5e7eb;
+  color: var(--text-2);
+}
+.nav-link:active {
+  transform: translateY(1px);
 }
 .nav-link.active {
-  background: linear-gradient(135deg, #2563eb, #7c3aed);
-  color: white;
+  background: linear-gradient(135deg, var(--primary-a), var(--primary-b));
+  color: #fff;
   box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.25);
 }
 
-/* Right side of nav: price + network + connect */
+/* Right side (price + network + connect) */
 .nav-right {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 8px;
+  flex: 0 0 auto;
 }
 
 /* Price chip */
 .price-chip {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.2rem 0.6rem;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.9);
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: var(--pill);
+  background: rgba(15, 23, 42, 0.92);
   border: 1px solid rgba(148, 163, 184, 0.35);
-  font-size: 0.75rem;
+  font-size: 12px;
+  line-height: 1;
 }
 .price-label {
-  color: #9ca3af;
+  color: var(--muted);
 }
 .price-value {
-  font-weight: 600;
-  color: #facc15;
+  font-weight: 800;
+  color: var(--warn);
+  letter-spacing: 0.2px;
 }
 
-/* Network */
+/* Network indicator */
 .network-indicator {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.2rem 0.55rem;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.9);
-  font-size: 0.75rem;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: var(--pill);
+  background: rgba(15, 23, 42, 0.92);
+  font-size: 12px;
+  line-height: 1;
 }
 .dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
+  width: 9px;
+  height: 9px;
+  border-radius: var(--pill);
 }
 .dot-connected {
-  background: #22c55e;
-  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2);
+  background: var(--success);
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.18);
 }
 .dot-disconnected {
   background: #6b7280;
 }
 .network-label {
-  color: #e5e7eb;
+  color: var(--text-2);
 }
 
-/* Buttons */
+/* =========================
+   Buttons
+========================= */
 .btn {
-  border-radius: 999px;
+  border-radius: var(--pill);
   border: 1px solid transparent;
-  padding: 0.35rem 0.9rem;
-  font-size: 0.85rem;
-  font-weight: 600;
+  padding: 9px 14px;
+  min-height: var(--tap);
+  font-size: 13px;
+  font-weight: 800;
   cursor: pointer;
   background: #1f2937;
-  color: #e5e7eb;
+  color: var(--text-2);
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.25rem;
-  transition: all 0.15s ease;
+  gap: 6px;
+
+  transition: transform 0.12s ease, filter 0.12s ease, background 0.12s ease,
+    border-color 0.12s ease, box-shadow 0.12s ease;
 }
 
 .btn:disabled {
-  opacity: 0.5;
-  cursor: default;
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #2563eb, #7c3aed);
-  color: #f9fafb;
+  background: linear-gradient(135deg, var(--primary-a), var(--primary-b));
+  color: #fff;
   border-color: rgba(129, 140, 248, 0.6);
-  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.28);
 }
 .btn-primary:hover:not(:disabled) {
-  filter: brightness(1.07);
-  transform: translateY(-1px);
+  filter: brightness(1.05);
 }
+
 .btn-secondary {
   background: rgba(15, 23, 42, 0.95);
   border-color: rgba(148, 163, 184, 0.3);
@@ -200,53 +323,66 @@ body {
 .btn-secondary:hover:not(:disabled) {
   background: rgba(31, 41, 55, 0.95);
 }
+
 .btn-outline {
   background: transparent;
-  border-color: rgba(148, 163, 184, 0.4);
-  color: #e5e7eb;
+  border-color: rgba(148, 163, 184, 0.42);
+  color: var(--text-2);
 }
 .btn-outline:hover:not(:disabled) {
-  background: rgba(30, 64, 175, 0.2);
+  background: rgba(30, 64, 175, 0.18);
 }
+
 .btn-connect {
-  padding-inline: 0.9rem;
+  padding-inline: 14px;
   background: #111827;
   border-color: rgba(148, 163, 184, 0.6);
 }
 .btn-connect:hover:not(:disabled) {
-  background: rgba(37, 99, 235, 0.2);
+  background: rgba(37, 99, 235, 0.18);
 }
+
 .btn-connected {
   background: rgba(22, 163, 74, 0.12);
   color: #bbf7d0;
   border-color: rgba(34, 197, 94, 0.7);
 }
+
 .btn-max {
-  font-size: 0.75rem;
-  padding: 0.25rem 0.6rem;
-  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 7px 10px;
+  min-height: 36px;
+  border-radius: var(--pill);
   border: 1px solid rgba(148, 163, 184, 0.5);
   background: rgba(15, 23, 42, 0.9);
-  color: #e5e7eb;
+  color: var(--text-2);
   cursor: pointer;
   white-space: nowrap;
+  transition: background 0.12s ease, transform 0.12s ease;
 }
 .btn-max:hover {
-  background: rgba(30, 64, 175, 0.5);
+  background: rgba(30, 64, 175, 0.42);
 }
+.btn-max:active {
+  transform: translateY(1px);
+}
+
 .btn-full {
   width: 100%;
 }
 
-/* Main content */
+/* =========================
+   Main Content / Screens
+========================= */
 .main-content {
   flex: 1;
-  padding: 1rem;
-  max-width: 1200px;
+  padding: 14px 12px 18px;
+  max-width: var(--page-max);
+  width: 100%;
   margin: 0 auto;
 }
 
-/* Screens */
 .screen {
   display: none;
 }
@@ -254,35 +390,38 @@ body {
   display: block;
 }
 
-/* Screen header */
 .screen-header {
-  margin-bottom: 1rem;
+  margin-bottom: 14px;
 }
 .screen-header h1 {
-  margin: 0 0 0.3rem;
-  font-size: 1.4rem;
-  color: #e5e7eb;
+  margin: 0 0 6px;
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--text-2);
 }
 .screen-subtitle {
   margin: 0;
-  font-size: 0.9rem;
-  color: #9ca3af;
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.45;
 }
 
-/* Hero layout (Home) */
+/* =========================
+   Home (Hero)
+========================= */
 .hero-layout {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--gap-2);
 }
 
 .hero-card {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  padding: 1rem;
-  border-radius: 1rem;
-  background: radial-gradient(circle at top left, #1e293b 0, #020617 55%, #000 100%);
+  gap: var(--gap-2);
+  padding: 16px;
+  border-radius: var(--radius-3);
+  background: var(--card-strong);
   border: 1px solid rgba(148, 163, 184, 0.3);
   box-shadow: 0 20px 45px rgba(15, 23, 42, 0.7);
 }
@@ -290,391 +429,349 @@ body {
 .hero-main {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 12px;
 }
+
 .hero-main h1 {
   margin: 0;
-  font-size: 1.4rem;
-  color: #f9fafb;
+  font-size: 22px;
+  line-height: 1.12;
+  color: var(--text-1);
 }
+
 .hero-lead {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 14px;
+  line-height: 1.55;
   color: #cbd5f5;
 }
 
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6rem;
+  gap: 10px;
 }
 
 .hero-wallet {
-  margin-top: 0.4rem;
-  padding: 0.7rem 0.8rem;
-  border-radius: 0.75rem;
+  margin-top: 4px;
+  padding: 12px;
+  border-radius: var(--radius-2);
   background: rgba(15, 23, 42, 0.9);
   border: 1px solid rgba(148, 163, 184, 0.3);
 }
 
-/* Status row (used in many places) */
+/* Shared status rows */
 .status-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.25rem;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.status-row:last-child {
+  margin-bottom: 0;
 }
 .status-label {
-  font-size: 0.8rem;
-  color: #9ca3af;
+  font-size: 13px;
+  color: var(--muted);
 }
 .status-value {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: #e5e7eb;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-2);
+  text-align: right;
+  word-break: break-word;
 }
 
-/* Info list, notes */
-.info-list {
-  margin: 0.4rem 0 0.4rem;
-  padding-left: 1.2rem;
-  font-size: 0.85rem;
-  color: #d1d5db;
-}
-.info-list li {
-  margin-bottom: 0.15rem;
-}
-.info-note {
-  margin: 0.4rem 0 0;
-  font-size: 0.8rem;
-  color: #9ca3af;
-}
-
-/* Hero side */
-.hero-side {
-  padding: 0.8rem;
-  border-radius: 0.8rem;
-  background: radial-gradient(circle at top right, #0f172a 0, #020617 70%);
-  border: 1px solid rgba(148, 163, 184, 0.25);
-}
-.hero-side h2 {
-  margin: 0 0 0.3rem;
-  font-size: 1rem;
-}
-
-/* Roadmap card */
-.home-roadmap-card {
-  padding: 1rem;
-  border-radius: 1rem;
-  background: rgba(15, 23, 42, 0.95);
-  border: 1px solid rgba(148, 163, 184, 0.3);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
-}
-.roadmap-header h2 {
-  margin: 0;
-  font-size: 1.1rem;
-}
-.roadmap-subtitle {
-  margin: 0.2rem 0 0.8rem;
-  font-size: 0.85rem;
-  color: #9ca3af;
-}
-.roadmap-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-.roadmap-column h3 {
-  margin: 0 0 0.25rem;
-  font-size: 0.95rem;
-  color: #bfdbfe;
-}
-.roadmap-list {
-  margin: 0;
-  padding-left: 1.2rem;
-  font-size: 0.85rem;
-  color: #e5e7eb;
-}
-.roadmap-list li {
-  margin-bottom: 0.15rem;
-}
-.roadmap-sublist {
-  margin-top: 0.25rem;
-  padding-left: 1.1rem;
-}
-.roadmap-footer {
-  margin-top: 0.8rem;
-  border-top: 1px dashed rgba(148, 163, 184, 0.4);
-  padding-top: 0.5rem;
-}
-.roadmap-tagline {
-  margin: 0;
-  font-size: 0.9rem;
-  color: #e5e7eb;
-}
-
-/* Swap layout */
+/* =========================
+   Swap
+========================= */
 .swap-layout {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-}
-.swap-card {
-  border-radius: 1rem;
-  padding: 1rem;
-  background: radial-gradient(circle at top, #0f172a 0, #020617 70%);
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.7);
-}
-.swap-header {
-  margin-bottom: 0.75rem;
+  gap: var(--gap-2);
 }
 
-/* Swap tabs */
+.swap-card {
+  border-radius: var(--radius-3);
+  padding: 16px;
+  background: var(--card);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  box-shadow: var(--shadow-1);
+}
+
+.swap-header {
+  margin-bottom: 12px;
+}
+
 .swap-tabs {
   display: inline-flex;
-  padding: 0.15rem;
-  border-radius: 999px;
+  padding: 3px;
+  border-radius: var(--pill);
   background: rgba(15, 23, 42, 0.9);
   border: 1px solid rgba(148, 163, 184, 0.35);
+  gap: 4px;
 }
+
 .swap-tab {
   border: none;
   outline: none;
-  padding: 0.25rem 0.7rem;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  color: #9ca3af;
+  padding: 9px 12px;
+  min-height: 36px;
+  border-radius: var(--pill);
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--muted);
   background: transparent;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background 0.12s ease, color 0.12s ease, transform 0.12s ease;
+}
+.swap-tab:active {
+  transform: translateY(1px);
 }
 .swap-tab.active {
-  background: linear-gradient(135deg, #2563eb, #7c3aed);
-  color: #f9fafb;
-  box-shadow: 0 10px 26px rgba(37, 99, 235, 0.35);
+  background: linear-gradient(135deg, var(--primary-a), var(--primary-b));
+  color: #fff;
+  box-shadow: 0 10px 26px rgba(37, 99, 235, 0.28);
 }
 
-/* Swap body */
 .swap-body {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 12px;
 }
+
 .swap-row {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 8px;
 }
+
 .swap-label-row {
   display: flex;
   justify-content: space-between;
-  font-size: 0.8rem;
+  gap: 10px;
+  font-size: 13px;
 }
 .swap-label {
-  color: #e5e7eb;
+  color: var(--text-2);
+  font-weight: 800;
 }
 .swap-balance {
-  color: #9ca3af;
+  color: var(--muted);
+  font-weight: 700;
 }
 
 .swap-input-row {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.25rem;
-  border-radius: 0.75rem;
+  gap: 8px;
+  padding: 10px;
+  border-radius: var(--radius-2);
   background: rgba(15, 23, 42, 0.95);
   border: 1px solid rgba(148, 163, 184, 0.4);
 }
+
 .swap-input {
   flex: 1;
   border: none;
   outline: none;
   background: transparent;
-  color: #f9fafb;
-  font-size: 0.95rem;
+  color: var(--text-1);
+  font-size: 16px;
+  font-weight: 900;
+  min-width: 0;
 }
 .swap-input::placeholder {
   color: #6b7280;
-}
-.swap-token-tag {
-  border: none;
-  outline: none;
-  border-radius: 999px;
-  padding: 0.25rem 0.7rem;
-  font-size: 0.8rem;
-  cursor: default;
-  background: rgba(15, 23, 42, 0.9);
-  color: #e5e7eb;
-  border: 1px solid rgba(148, 163, 184, 0.4);
+  font-weight: 800;
 }
 
-.swap-rate {
-  font-size: 0.8rem;
-  color: #9ca3af;
-  display: flex;
-  justify-content: flex-end;
+.swap-token-tag {
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(15, 23, 42, 0.9);
+  color: var(--text-2);
+  border-radius: var(--pill);
+  padding: 8px 12px;
+  min-height: 36px;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: default;
 }
 
 .btn-swap-action {
   width: 100%;
-  margin-top: 0.25rem;
 }
 
 .tx-status {
-  margin-top: 0.3rem;
-  font-size: 0.8rem;
-  color: #9ca3af;
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.35;
 }
 
-/* Swap info card */
-.swap-info-card {
-  padding: 1rem;
-  border-radius: 1rem;
-  background: rgba(15, 23, 42, 0.95);
-  border: 1px solid rgba(148, 163, 184, 0.3);
-  font-size: 0.85rem;
-}
-
-/* Dice layout */
+/* =========================
+   Dice
+========================= */
 .dice-layout {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-}
-.dice-card {
-  border-radius: 1rem;
-  padding: 1rem;
-  background: radial-gradient(circle at top, #0f172a 0, #020617 70%);
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.7);
+  gap: var(--gap-2);
 }
 
-/* Dice sections */
+.dice-card {
+  border-radius: var(--radius-3);
+  padding: 16px;
+  background: var(--card);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  box-shadow: var(--shadow-1);
+}
+
 .dice-section {
-  margin-bottom: 0.8rem;
+  margin-bottom: 14px;
 }
 .dice-section:last-child {
   margin-bottom: 0;
 }
+
 .dice-section h2 {
-  margin: 0 0 0.4rem;
-  font-size: 1rem;
-  color: #e5e7eb;
-}
-.dice-label {
-  display: block;
-  font-size: 0.85rem;
-  margin-bottom: 0.25rem;
-  color: #e5e7eb;
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--text-2);
 }
 
-/* Dice input row */
+.dice-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  color: var(--text-2);
+}
+
+/* Bet input row: fits nicely on mobile */
 .dice-input-row {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.3rem;
-  border-radius: 0.9rem;
+  gap: 8px;
+  padding: 10px;
+  border-radius: var(--radius-2);
   background: rgba(15, 23, 42, 0.95);
   border: 1px solid rgba(148, 163, 184, 0.5);
 }
+
 .dice-input {
   flex: 1;
   border: none;
   outline: none;
   background: transparent;
-  color: #f9fafb;
-  font-size: 1rem;
-  padding: 0.2rem 0;
+  color: var(--text-1);
+  font-size: 16px;
+  font-weight: 900;
+  padding: 2px 0;
+  min-width: 0;
 }
+
 .dice-input::placeholder {
   color: #6b7280;
+  font-weight: 800;
 }
 
-/* Dice minimum line */
 .dice-minimum-line {
-  margin-top: 0.25rem;
-  font-size: 0.8rem;
-  color: #9ca3af;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.35;
 }
 
-/* Guess buttons (Even/Odd) */
+/* Even/Odd buttons: big, thumb-friendly */
 .dice-guess-buttons {
-  display: flex;
-  gap: 0.6rem;
-  margin-top: 0.35rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
+
 .guess-button {
-  flex: 1;
-  min-height: 2.5rem;
-  font-size: 0.95rem;
-  border-radius: 0.75rem;
+  min-height: var(--tap);
+  font-size: 15px;
+  font-weight: 900;
+  border-radius: var(--radius-2);
   border: 1px solid rgba(148, 163, 184, 0.6);
   background: rgba(15, 23, 42, 0.9);
-  color: #e5e7eb;
+  color: var(--text-2);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform 0.12s ease, background 0.12s ease,
+    border-color 0.12s ease, box-shadow 0.12s ease;
 }
 .guess-button:hover {
-  background: rgba(30, 64, 175, 0.5);
+  background: rgba(30, 64, 175, 0.45);
+}
+.guess-button:active {
+  transform: translateY(1px);
 }
 .guess-button.active {
-  border-color: rgba(37, 99, 235, 0.8);
-  background: linear-gradient(135deg, #2563eb, #7c3aed);
-  color: #f9fafb;
-  box-shadow: 0 10px 26px rgba(37, 99, 235, 0.45);
+  border-color: rgba(37, 99, 235, 0.85);
+  background: linear-gradient(135deg, var(--primary-a), var(--primary-b));
+  color: #fff;
+  box-shadow: 0 12px 26px rgba(37, 99, 235, 0.35);
 }
 
-/* Dice quick tools */
+/* Quick tools: always stays inside viewport */
 .dice-tools {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 8px;
 }
+
 .dice-tool-buttons {
-  display: flex;
-  gap: 0.4rem;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
 }
+
 .btn-tool {
-  flex: 1;
-  border-radius: 0.7rem;
-  border: 1px solid rgba(148, 163, 184, 0.6);
+  min-height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.55);
   background: rgba(15, 23, 42, 0.95);
-  color: #e5e7eb;
-  font-size: 0.8rem;
-  min-height: 2.2rem;
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 900;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform 0.12s ease, background 0.12s ease;
 }
 .btn-tool:hover {
-  background: rgba(30, 64, 175, 0.5);
+  background: rgba(30, 64, 175, 0.42);
+}
+.btn-tool:active {
+  transform: translateY(1px);
 }
 
-/* Dice note */
+/* Notes */
 .dice-note {
-  margin: 0.3rem 0 0;
-  font-size: 0.8rem;
-  color: #9ca3af;
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.45;
 }
 
-/* Dice visual area */
+/* Visual area */
 .dice-visual {
   position: relative;
-  margin-top: 0.4rem;
-  padding: 1.1rem 0.7rem;
-  border-radius: 1rem;
+  margin-top: 8px;
+  padding: 16px 12px;
+  border-radius: var(--radius-3);
   background: radial-gradient(circle at top, #020617 0, #000 60%);
   border: 1px solid rgba(148, 163, 184, 0.35);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.6rem;
+  gap: 12px;
   overflow: hidden;
 }
 
-/* Shake animation */
+/* Shaking animation hook:
+   Your JS can add/remove "dice-shaking" class */
 @keyframes dice-shake {
   0% {
     transform: translateX(0);
@@ -695,53 +792,51 @@ body {
     transform: translateX(0);
   }
 }
-.dice-visual.dice-shaking {
+.dice-visual.dice-shaking,
+.dice-visual.dice-rolling {
   animation: dice-shake 0.25s linear infinite;
 }
 
-/* Dice orb background */
 .dice-orb {
   position: absolute;
-  inset: 15%;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.25), transparent);
-  filter: blur(8px);
+  inset: 16%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.22), transparent);
+  filter: blur(10px);
   pointer-events: none;
 }
 
-/* Coins container */
 .dice-coins {
   position: relative;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.45rem;
+  gap: 10px;
   z-index: 1;
 }
 
-/* Single coin */
+/* Coins */
 .dice-coin {
-  width: 52px;
-  height: 52px;
-  border-radius: 999px;
+  width: 54px;
+  height: 54px;
+  border-radius: var(--pill);
   background: #e5e7eb;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  box-shadow:
-    0 8px 18px rgba(0, 0, 0, 0.65),
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.65),
     0 0 0 1px rgba(148, 163, 184, 0.5);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 .dice-coin::before {
   content: "";
   width: 70%;
   height: 70%;
-  border-radius: 999px;
+  border-radius: var(--pill);
   background: radial-gradient(circle at 30% 20%, #f9fafb, #d4d4d8);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.42);
 }
 
-/* White coin */
+/* White/Red variants */
 .dice-coin-white {
   background: #f9fafb;
 }
@@ -749,619 +844,316 @@ body {
   background: radial-gradient(circle at 30% 20%, #fefce8, #e5e7eb);
 }
 
-/* Red coin */
 .dice-coin-red {
   background: #b91c1c;
-  box-shadow:
-    0 8px 18px rgba(153, 27, 27, 0.7),
+  box-shadow: 0 8px 18px rgba(153, 27, 27, 0.7),
     0 0 0 1px rgba(248, 113, 113, 0.7);
 }
 .dice-coin-red::before {
-  background: radial-gradient(circle at 30% 20%, #fecaca, #b91c1c);
+  background: radial-gradient(circle at 30% 20%, #fecaca, #991b1b);
 }
 
-/* Dice visual caption */
-.dice-visual + .dice-note {
-  margin-top: 0.5rem;
-}
-
-/* Last result */
-.dice-last-result h2 {
-  margin-bottom: 0.4rem;
-}
-.last-row {
+/* Last result card area */
+.dice-last-result .last-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.25rem;
-  font-size: 0.8rem;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px dashed rgba(148, 163, 184, 0.22);
+}
+.dice-last-result .last-row:last-child {
+  border-bottom: none;
 }
 .last-label {
-  color: #9ca3af;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
 }
 .last-value {
-  color: #e5e7eb;
-}
-
-/* Footer */
-.footer {
-  width: 100%;
-  margin-top: 1.5rem;
-  padding: 0.9rem 1.2rem;
-  background: rgba(15, 23, 42, 0.96);
-  border-top: 1px solid rgba(148, 163, 184, 0.25);
-  font-size: 0.8rem;
-  color: #9ca3af;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  text-align: center;
-}
-
-.footer-main,
-.footer-links {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-}
-
-.footer a {
-  color: #93c5fd;
-  text-decoration: none;
-  font-weight: 500;
-}
-.footer a:hover {
-  text-decoration: underline;
-}
-
-.footer-dot {
-  color: #4b5563;
-}
-
-/* Footer layout on larger screens */
-@media (min-width: 768px) {
-  .footer {
-    padding-inline: 1.5rem;
-    flex-direction: row;
-    justify-content: space-between;
-    text-align: left;
-  }
-
-  .footer-main,
-  .footer-links {
-    justify-content: flex-start;
-  }
-}
-
-/* ===== RESPONSIVE (TABLET & DESKTOP) ===== */
-@media (min-width: 768px) {
-  .top-nav {
-    padding: 0.7rem 1.5rem;
-  }
-
-  .nav-center {
-    display: flex;
-  }
-
-  .main-content {
-    padding: 1.5rem 1.5rem 1.5rem;
-  }
-
-  .hero-layout {
-    gap: 1.25rem;
-  }
-
-  .hero-card {
-    flex-direction: row;
-  }
-  .hero-main {
-    flex: 3;
-  }
-  .hero-side {
-    flex: 2;
-    margin-left: 0.4rem;
-  }
-
-  .roadmap-grid {
-    flex-direction: row;
-  }
-
-  .swap-layout {
-    flex-direction: row;
-    align-items: flex-start;
-  }
-  .swap-card {
-    flex: 3;
-  }
-  .swap-info-card {
-    flex: 2;
-  }
-
-  .dice-layout {
-    flex-direction: row;
-    align-items: flex-start;
-  }
-  .dice-card-left {
-    flex: 1.4;
-  }
-  .dice-card-right {
-    flex: 2;
-  }
-
-  .dice-coin {
-    width: 56px;
-    height: 56px;
-  }
-}
-
-/* ===== SMALL DEVICES TUNING ===== */
-@media (max-width: 480px) {
-  .top-nav {
-    gap: 0.4rem;
-  }
-  .brand-title {
-    font-size: 0.9rem;
-  }
-  .brand-subtitle {
-    font-size: 0.7rem;
-  }
-  .price-chip {
-    display: none; /* to save space on very small devices */
-  }
-  .nav-right {
-    gap: 0.3rem;
-  }
-
-  .hero-card,
-  .home-roadmap-card,
-  .swap-card,
-  .swap-info-card,
-  .dice-card {
-    padding: 0.8rem;
-  }
-
-  .dice-guess-buttons {
-    gap: 0.4rem;
-  }
-  .dice-tool-buttons {
-    gap: 0.3rem;
-  }
-
-  .dice-coin {
-    width: 48px;
-    height: 48px;
-  }
-}
-
-/* =========================================
-   Mobile Display Fix for Nav + VIN Price
-   ========================================= */
-@media (max-width: 768px) {
-  /* Ensure main navigation always visible */
-  .nav-center {
-    display: flex !important;
-    width: 100%;
-    justify-content: center;
-  }
-
-  .nav-links {
-    display: flex !important;
-    width: 100%;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-  }
-
-  /* Adjust top navigation layout */
-  .top-nav {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .brand {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  .nav-right {
-    width: 100%;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    margin-top: 0.25rem;
-  }
-
-  /* Make sure VIN price chip always visible */
-  .price-chip {
-    display: inline-flex !important;
-    font-size: 0.75rem;
-    padding: 0.2rem 0.6rem;
-  }
-}
-
-/* Extra support for very small screens */
-@media (max-width: 480px) {
-  .nav-center {
-    display: flex !important;
-  }
-
-  .price-chip {
-    display: inline-flex !important;
-  }
-}
-
-/* =========================================================
-   LOTTO STYLES (FINAL)
-   Clean • Professional • Mobile-first
-   ========================================================= */
-
-/* Lotto layout cards */
-.lotto-card {
-  background: rgba(2, 6, 23, 0.95);
-  border: 1px solid rgba(148, 163, 184, 0.25);
-  border-radius: 1rem;
-  padding: 1rem;
-}
-
-/* Section spacing */
-.lotto-section {
-  margin-bottom: 1.1rem;
-}
-.lotto-section h2 {
-  font-size: 0.95rem;
-  font-weight: 600;
-  margin-bottom: 0.6rem;
-  color: #e5e7eb;
-}
-
-/* ======================
-   BET TABLE
-   ====================== */
-
-/* Header */
-.lotto-table-header {
-  display: grid;
-  grid-template-columns: 0.9fr 1fr 1.4fr 32px;
-  gap: 0.5rem;
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #9ca3af;
-  padding: 0 0.25rem;
-  margin-bottom: 0.4rem;
-}
-
-/* Rows container */
-#lottoRows {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-/* Single row */
-.lotto-row {
-  display: grid;
-  grid-template-columns: 0.9fr 1fr 1.4fr 32px;
-  gap: 0.45rem;
-  align-items: center;
-  padding: 0.45rem 0.5rem;
-  border-radius: 0.85rem;
-  background: rgba(15, 23, 42, 0.95);
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  transition: border-color 0.15s ease, background 0.15s ease;
-}
-
-/* Error highlight (JS) */
-.lotto-row.lotto-error {
-  border-color: rgba(239, 68, 68, 0.9);
-  background: rgba(127, 29, 29, 0.35);
-}
-
-/* ======================
-   INPUTS
-   ====================== */
-
-/* Number input */
-.lotto-number {
-  width: 100%;
-  text-align: center;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #f9fafb;
-  background: transparent;
-  border: none;
-  outline: none;
-}
-.lotto-number::placeholder {
-  color: #6b7280;
-}
-
-/* Amount input */
-.lotto-amount {
-  width: 100%;
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 900;
   text-align: right;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #f9fafb;
-  background: transparent;
-  border: none;
+  word-break: break-word;
+}
+
+/* =========================
+   Lotto
+========================= */
+.lotto-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-2);
+}
+
+.lotto-card {
+  border-radius: var(--radius-3);
+  padding: 16px;
+  background: var(--card);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  box-shadow: var(--shadow-1);
+}
+
+.lotto-section {
+  margin-bottom: 14px;
+}
+.lotto-section:last-child {
+  margin-bottom: 0;
+}
+
+.lotto-section h2 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--text-2);
+}
+
+/* If your lotto UI contains inputs/buttons similar to dice/swap,
+   these generic rules improve touch feel without requiring HTML changes. */
+.lotto-card input[type="text"],
+.lotto-card input[type="number"],
+.lotto-card select {
+  width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background: rgba(15, 23, 42, 0.92);
+  color: var(--text-1);
+  border-radius: 12px;
+  padding: 12px 12px;
+  min-height: var(--tap);
+  font-size: 16px;
+  font-weight: 900;
   outline: none;
 }
-.lotto-amount::placeholder {
+
+.lotto-card input::placeholder {
   color: #6b7280;
+  font-weight: 800;
 }
 
-/* ======================
-   BET TYPE
-   ====================== */
-
-.lotto-type {
-  display: flex;
-  gap: 0.6rem;
-  justify-content: space-between;
+.lotto-card .btn,
+.lotto-card button.btn {
+  width: 100%;
 }
 
-.lotto-type label {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.75rem;
-  color: #e5e7eb;
-  cursor: pointer;
-  white-space: nowrap;
+/* Common list/rows in lotto */
+.lotto-card .status-row {
+  margin-bottom: 6px;
 }
 
-.lotto-type input[type="radio"] {
-  accent-color: #6366f1;
-  cursor: pointer;
+/* =========================
+   Utility: Focus, Errors, Success
+========================= */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+  border-color: rgba(37, 99, 235, 0.7);
 }
 
-/* ======================
-   REMOVE ROW
-   ====================== */
-
-.btn-remove-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  border: none;
-  background: rgba(239, 68, 68, 0.15);
-  color: #fca5a5;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-.btn-remove-row:hover {
-  background: rgba(239, 68, 68, 0.35);
-  color: #fecaca;
+.tx-status,
+.dice-note,
+.screen-subtitle {
+  word-break: break-word;
 }
 
-/* ======================
-   TOTAL / STATUS
-   ====================== */
-
-#lottoTotalBet {
-  font-weight: 600;
-  color: #facc15;
+.is-success {
+  color: var(--success) !important;
+}
+.is-danger {
+  color: var(--danger) !important;
+}
+.is-warn {
+  color: var(--warn) !important;
 }
 
-#lottoStatus {
-  margin-top: 0.35rem;
-  font-size: 0.8rem;
-  color: #9ca3af;
-}
-
-/* Result box */
-#lottoResultDetail {
-  font-size: 0.85rem;
-  line-height: 1.45;
-  color: #e5e7eb;
-  padding: 0.75rem;
-  border-radius: 0.9rem;
-  background: rgba(2, 6, 23, 0.85);
-  border: 1px dashed rgba(148, 163, 184, 0.35);
-}
-
-/* Disabled state */
-.lotto-disabled {
-  opacity: 0.5;
-  pointer-events: none;
-}
-
-/* ======================
-   MOBILE OPTIMIZATION
-   ====================== */
-
-@media (max-width: 640px) {
-  .lotto-card {
-    padding: 0.85rem;
+/* =========================
+   Mobile Navigation Enhancements
+   (Keep it compact; avoid crowding)
+========================= */
+@media (max-width: 420px) {
+  .top-nav {
+    padding: 10px 10px;
+    gap: 8px;
   }
 
-  .lotto-table-header {
-    grid-template-columns: 1fr 1fr 1fr 28px;
-    font-size: 0.65rem;
+  .price-chip,
+  .network-indicator {
+    display: none; /* free space for wallet button on very small screens */
   }
 
-  .lotto-row {
-    grid-template-columns: 1fr 1fr 1fr 28px;
-    gap: 0.35rem;
-    padding: 0.4rem;
+  .btn-connect {
+    padding-inline: 12px;
+    min-height: 40px;
   }
 
-  .lotto-type {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.2rem;
+  .brand-subtitle {
+    display: none;
   }
 
-  .btn-remove-row {
-    width: 24px;
-    height: 24px;
-    font-size: 0.75rem;
+  .hero-actions .btn {
+    width: 100%;
+  }
+
+  .dice-tool-buttons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dice-coin {
+    width: 50px;
+    height: 50px;
   }
 }
 
-/* =========================================================
-   MOBILE OPTIMIZATION — DICE & LOTTO
-   Append at END of style.css
-   ========================================================= */
-
-/* ---------- GLOBAL MOBILE TUNING ---------- */
-@media (max-width: 768px) {
+/* =========================
+   Small Phones: One-screen Dice controls
+========================= */
+@media (max-width: 480px) {
   .main-content {
-    padding: 0.75rem;
+    padding: 12px 10px 16px;
   }
 
   .screen-header h1 {
-    font-size: 1.2rem;
+    font-size: 19px;
   }
 
-  .screen-subtitle {
-    font-size: 0.85rem;
-  }
-}
-
-/* =========================================================
-   DICE — COMPACT & ONE-SCREEN ON MOBILE
-   ========================================================= */
-@media (max-width: 768px) {
-  .dice-layout {
-    gap: 0.75rem;
-  }
-
-  .dice-card {
-    padding: 0.75rem;
-  }
-
-  .dice-section {
-    margin-bottom: 0.6rem;
-  }
-
-  /* Bet input */
-  .dice-input-row {
-    padding: 0.25rem;
-    border-radius: 0.8rem;
-  }
-
-  .dice-input {
-    font-size: 1rem;
-    padding: 0.15rem 0;
-  }
-
-  /* Even / Odd buttons */
-  .dice-guess-buttons {
-    gap: 0.5rem;
-  }
-
-  .guess-button {
-    min-height: 2.8rem;
-    font-size: 1rem;
-    border-radius: 0.8rem;
-  }
-
-  /* Quick tools */
-  .dice-tool-buttons {
-    gap: 0.35rem;
-  }
-
-  .btn-tool {
-    min-height: 2.4rem;
-    font-size: 0.8rem;
-    border-radius: 0.75rem;
-  }
-
-  /* Play button */
-  #dicePlayButton {
-    min-height: 3rem;
-    font-size: 1rem;
-    border-radius: 0.9rem;
-  }
-
-  /* Hide non-essential text to save space */
-  .dice-note {
-    font-size: 0.75rem;
-  }
-
-  /* Visual smaller but still clear */
-  .dice-visual {
-    padding: 0.7rem 0.5rem;
-    border-radius: 0.9rem;
-  }
-
-  .dice-coin {
-    width: 42px;
-    height: 42px;
-  }
-}
-
-/* =========================================================
-   LOTTO — COMPACT & TOUCH-FRIENDLY
-   ========================================================= */
-@media (max-width: 768px) {
-  .lotto-layout {
-    gap: 0.75rem;
-  }
-
-  .lotto-card {
-    padding: 0.75rem;
-  }
-
-  .lotto-section {
-    margin-bottom: 0.6rem;
-  }
-
-  /* Number input */
-  .lotto-input-row input,
-  .lotto-input {
-    font-size: 1rem;
-    min-height: 2.6rem;
-    border-radius: 0.75rem;
-  }
-
-  /* Bet type buttons (BetOne / Bet27) */
-  .lotto-bet-type {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .lotto-bet-type button {
-    flex: 1;
-    min-height: 2.8rem;
-    font-size: 0.95rem;
-    border-radius: 0.8rem;
-  }
-
-  /* Play button */
-  #lottoPlayButton {
-    min-height: 3rem;
-    font-size: 1rem;
-    border-radius: 0.9rem;
-  }
-
-  /* Reduce text noise */
-  .lotto-note,
-  .lotto-hint {
-    font-size: 0.75rem;
-  }
-}
-
-/* =========================================================
-   EXTRA: PREVENT OVERFLOW & DOUBLE SCROLL
-   ========================================================= */
-@media (max-width: 768px) {
-  body {
-    overflow-x: hidden;
-  }
-
+  .swap-card,
   .dice-card,
   .lotto-card {
-    max-width: 100%;
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  .swap-input-row,
+  .dice-input-row {
+    padding: 10px;
+  }
+
+  .swap-input,
+  .dice-input {
+    font-size: 16px;
+  }
+
+  /* Make play buttons stand out and remain easy to tap */
+  #dicePlayButton,
+  #swapActionButton,
+  #diceApproveButton,
+  #refreshBalances {
+    min-height: 48px;
+  }
+
+  /* Ensure Even/Odd stays full width and easy to tap */
+  .dice-guess-buttons {
+    gap: 10px;
+  }
+
+  /* Reduce vertical spacing so controls fit without scrolling */
+  .dice-section {
+    margin-bottom: 12px;
+  }
+
+  .dice-visual {
+    padding: 14px 12px;
+    gap: 10px;
+  }
+
+  .dice-last-result .last-row {
+    padding: 5px 0;
+  }
+}
+
+/* =========================
+   Tablet
+========================= */
+@media (min-width: 481px) and (max-width: 1024px) {
+  .main-content {
+    padding: 16px 14px 22px;
+  }
+
+  .screen-header h1 {
+    font-size: 22px;
+  }
+
+  .hero-card {
+    padding: 18px;
+  }
+
+  .swap-card,
+  .dice-card,
+  .lotto-card {
+    padding: 18px;
+  }
+
+  .dice-tool-buttons {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* =========================
+   Desktop Layout Upgrades
+========================= */
+@media (min-width: 1025px) {
+  .main-content {
+    padding: 18px 18px 26px;
+  }
+
+  /* Show center nav on desktop */
+  .nav-center {
+    display: block;
+  }
+
+  /* Home can become two-column if you later add hero-side */
+  .hero-layout {
+    gap: 18px;
+  }
+
+  /* Swap: keep centered and comfortable */
+  .swap-layout {
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  /* Dice: 2-column layout (wallet left, play right) */
+  .dice-layout {
+    display: grid;
+    grid-template-columns: 0.95fr 1.05fr;
+    gap: 18px;
+    align-items: start;
+  }
+
+  /* Lotto: 2-column layout if markup uses left/right cards */
+  .lotto-layout {
+    display: grid;
+    grid-template-columns: 0.95fr 1.05fr;
+    gap: 18px;
+    align-items: start;
+  }
+}
+
+/* =========================
+   Safe Area for iOS devices
+========================= */
+@supports (padding: max(0px)) {
+  .top-nav {
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+  }
+  .main-content {
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+  }
+}
+
+/* =========================
+   Optional: reduce motion
+========================= */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+  .dice-visual.dice-shaking,
+  .dice-visual.dice-rolling {
+    animation: none !important;
   }
 }
