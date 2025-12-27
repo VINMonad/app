@@ -1157,3 +1157,121 @@ textarea:focus {
     animation: none !important;
   }
 }
+/* =========================================================
+   MOBILE NAV FIX + FOOTER LINKS ALIGNMENT
+   (Append to END of style.css)
+========================================================= */
+
+/* =========================
+   FORCE SHOW MAIN NAV ON MOBILE
+   (Home / Swap / Dice / Lotto)
+========================= */
+@media (max-width: 768px) {
+  /* Make sure main menu is visible */
+  .nav-center {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    margin-top: 6px;
+    flex-wrap: wrap;
+  }
+
+  .nav-center .nav-link {
+    flex: 1 1 auto;
+    text-align: center;
+    padding: 8px 10px;
+    font-size: 13px;
+    font-weight: 800;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  /* Stack nav nicely on small screens */
+  .top-nav {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .nav-links {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+/* Extra small phones */
+@media (max-width: 420px) {
+  .nav-center .nav-link {
+    font-size: 12px;
+    padding: 7px 8px;
+  }
+}
+
+/* =========================
+   FOOTER LINKS (BOTTOM NAV / LINKS)
+========================= */
+.site-footer,
+.footer,
+.footer-links {
+  width: 100%;
+}
+
+/* Footer container */
+.site-footer,
+.footer {
+  margin-top: 24px;
+  padding: 18px 12px 22px;
+  border-top: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(2, 6, 23, 0.85);
+}
+
+/* Footer links wrapper */
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Individual footer link */
+.footer-links a,
+.footer a {
+  font-size: 13px;
+  font-weight: 700;
+  color: #cbd5e1;
+  padding: 6px 10px;
+  border-radius: 999px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.footer-links a:hover,
+.footer a:hover {
+  background: rgba(37, 99, 235, 0.25);
+  color: #ffffff;
+}
+
+/* Footer text (copyright / note) */
+.footer-text,
+.footer p {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #9ca3af;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* =========================
+   MOBILE FOOTER POLISH
+========================= */
+@media (max-width: 480px) {
+  .footer-links {
+    gap: 10px;
+  }
+
+  .footer-links a {
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+}
