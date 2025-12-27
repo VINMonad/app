@@ -1207,3 +1207,161 @@ body {
     font-size: 0.75rem;
   }
 }
+
+/* =========================================================
+   MOBILE OPTIMIZATION — DICE & LOTTO
+   Append at END of style.css
+   ========================================================= */
+
+/* ---------- GLOBAL MOBILE TUNING ---------- */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 0.75rem;
+  }
+
+  .screen-header h1 {
+    font-size: 1.2rem;
+  }
+
+  .screen-subtitle {
+    font-size: 0.85rem;
+  }
+}
+
+/* =========================================================
+   DICE — COMPACT & ONE-SCREEN ON MOBILE
+   ========================================================= */
+@media (max-width: 768px) {
+  .dice-layout {
+    gap: 0.75rem;
+  }
+
+  .dice-card {
+    padding: 0.75rem;
+  }
+
+  .dice-section {
+    margin-bottom: 0.6rem;
+  }
+
+  /* Bet input */
+  .dice-input-row {
+    padding: 0.25rem;
+    border-radius: 0.8rem;
+  }
+
+  .dice-input {
+    font-size: 1rem;
+    padding: 0.15rem 0;
+  }
+
+  /* Even / Odd buttons */
+  .dice-guess-buttons {
+    gap: 0.5rem;
+  }
+
+  .guess-button {
+    min-height: 2.8rem;
+    font-size: 1rem;
+    border-radius: 0.8rem;
+  }
+
+  /* Quick tools */
+  .dice-tool-buttons {
+    gap: 0.35rem;
+  }
+
+  .btn-tool {
+    min-height: 2.4rem;
+    font-size: 0.8rem;
+    border-radius: 0.75rem;
+  }
+
+  /* Play button */
+  #dicePlayButton {
+    min-height: 3rem;
+    font-size: 1rem;
+    border-radius: 0.9rem;
+  }
+
+  /* Hide non-essential text to save space */
+  .dice-note {
+    font-size: 0.75rem;
+  }
+
+  /* Visual smaller but still clear */
+  .dice-visual {
+    padding: 0.7rem 0.5rem;
+    border-radius: 0.9rem;
+  }
+
+  .dice-coin {
+    width: 42px;
+    height: 42px;
+  }
+}
+
+/* =========================================================
+   LOTTO — COMPACT & TOUCH-FRIENDLY
+   ========================================================= */
+@media (max-width: 768px) {
+  .lotto-layout {
+    gap: 0.75rem;
+  }
+
+  .lotto-card {
+    padding: 0.75rem;
+  }
+
+  .lotto-section {
+    margin-bottom: 0.6rem;
+  }
+
+  /* Number input */
+  .lotto-input-row input,
+  .lotto-input {
+    font-size: 1rem;
+    min-height: 2.6rem;
+    border-radius: 0.75rem;
+  }
+
+  /* Bet type buttons (BetOne / Bet27) */
+  .lotto-bet-type {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .lotto-bet-type button {
+    flex: 1;
+    min-height: 2.8rem;
+    font-size: 0.95rem;
+    border-radius: 0.8rem;
+  }
+
+  /* Play button */
+  #lottoPlayButton {
+    min-height: 3rem;
+    font-size: 1rem;
+    border-radius: 0.9rem;
+  }
+
+  /* Reduce text noise */
+  .lotto-note,
+  .lotto-hint {
+    font-size: 0.75rem;
+  }
+}
+
+/* =========================================================
+   EXTRA: PREVENT OVERFLOW & DOUBLE SCROLL
+   ========================================================= */
+@media (max-width: 768px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  .dice-card,
+  .lotto-card {
+    max-width: 100%;
+  }
+}
