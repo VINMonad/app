@@ -22,7 +22,7 @@
   https://vinmonad.github.io/app
 
 - 📦 **IPFS (Permanent Access)**  
-  https://ipfs.io/ipfs/bafybeibmja2jyfkjjkriji7z5yvhdmticmb6lfoywfcensnq64w333gj44
+  https://ipfs.io/ipfs/bafybeibbaqy4ovuga7yjufqjf6mceluohrk54x22gexwudxyi5hmwxgjiu
 
 > ⚠️ **Strong Recommendation**  
 > This DApp is fully client-side and open source.  
